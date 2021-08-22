@@ -9,11 +9,12 @@ GameEngine::GameEngine()
 
 void GameEngine::init() 
 {
-	std::vector<sf::VideoMode> videoModes = sf::VideoMode::getFullscreenModes();
-	_window.create(videoModes[0], "GameJam");
+	//std::vector<sf::VideoMode> videoModes = sf::VideoMode::getFullscreenModes();
+	//_window.create(videoModes[0], "GameJam");
+	_window.create(sf::VideoMode(1280, 720), "GameJam");
 	_window.setFramerateLimit(60);
 
-	changeScene(std::make_shared<Scene_Main_Menu>(this), "MAIN_MENU", true);
+	changeScene(std::make_shared<Scene_Main_Menu>(this), "MAIN_MENU", false);
 }
 
 void GameEngine::run() 
@@ -27,6 +28,10 @@ void GameEngine::run()
 void GameEngine::update() 
 {
 	if (_sceneMap.empty()) { return; }
+
+	handleInput();
+
+	if (!_isRunning) { return; }
 
 	_sceneMap[_activeScene]->tick();
 	_sceneMap[_activeScene]->render();
@@ -45,9 +50,17 @@ void GameEngine::handleInput()
 		{
 			quit();
 		}
-		else if (event.type == sf::Event::KeyPressed) 
+		else if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) 
 		{
-		
+
+			KeyAction action;
+			action.keyCode = event.key.code;
+			action.type = event.type == sf::Event::KeyPressed ? ActionType::KEY_PRESS : ActionType::KEY_RELEASE;
+
+			if (getActiveScene()->getKeyActionMap().find(action.keyCode) != getActiveScene()->getKeyActionMap().end())
+			{
+				getActiveScene()->onKeyAction(getActiveScene()->getKeyActionMap().at(event.key.code), action);
+			}
 		}
 	}
 }

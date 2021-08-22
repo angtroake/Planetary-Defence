@@ -8,6 +8,7 @@ public:
 	std::shared_ptr<Scene> getActiveScene();
 	void changeScene(std::shared_ptr<Scene> scene, const std::string & name, bool endScene);
 	void run();
+	void quit();
 
 protected:
 	
@@ -20,6 +21,5 @@ protected:
 	void init();
 	void update();
 	void handleInput();
-	void quit();
 
 };
