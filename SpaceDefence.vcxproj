@@ -27,7 +27,10 @@
   <ItemGroup>
     <ClInclude Include="src\Action.h" />
     <ClInclude Include="src\base.h" />
+    <ClInclude Include="src\Component.h" />
+    <ClInclude Include="src\ComponentManager.h" />
     <ClInclude Include="src\engine.h" />
+    <ClInclude Include="src\EntityManager.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Scene_Main_Menu.h" />
   </ItemGroup>

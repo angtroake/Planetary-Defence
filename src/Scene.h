@@ -1,5 +1,6 @@
 #pragma once
 #include "base.h"
+#include "EntityManager.h"
 
 class GameEngine;
 
@@ -8,6 +9,7 @@ class Scene
 protected:
 	GameEngine* _engine = nullptr;
 	sf::View _view;
+	EntityManager _entityManager;
 
 	std::map<int, std::string> _keyActionMap;
 

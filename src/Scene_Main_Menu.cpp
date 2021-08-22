@@ -9,6 +9,7 @@ Scene_Main_Menu::Scene_Main_Menu(GameEngine* engine) {
 
 void Scene_Main_Menu::init() {
 	registerKeyAction(sf::Keyboard::Escape, "QUIT");
+
 }
 
 void Scene_Main_Menu::render() {
@@ -16,7 +17,7 @@ void Scene_Main_Menu::render() {
 }
 
 void Scene_Main_Menu::tick() {
-
+	_entityManager.update();
 }
 
 void Scene_Main_Menu::onKeyAction(std::string actionName, KeyAction action)

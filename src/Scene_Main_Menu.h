@@ -2,6 +2,9 @@
 #include "Scene.h"
 class Scene_Main_Menu : public Scene
 {
+protected:
+
+
 public:
 	Scene_Main_Menu(GameEngine* engine);
 	void tick();
