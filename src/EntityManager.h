@@ -7,13 +7,22 @@
 
 typedef uint32_t Entity;
 
-const Entity MAX_ENTITIES = 1000;
+//Max amount of entities allowed in a scene.
+const Entity MAX_ENTITIES = 10000;
 
+//Tuple containing all possible components
+//Components must be added to this tuple to be usable with entities.
 typedef std::tuple<
 	Component::Transform[MAX_ENTITIES]
 > ComponentArrays;
 
 
+
+// Entity Manager manages all entity creation and removal.
+// Entities consist of components. There is space preallocated for a component for every entity.
+// Therefore, each entity has every component. However, components must be enabled 
+// for each entity. An entity is a unsigned integer
+//
 class EntityManager
 {
 private:
