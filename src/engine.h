@@ -1,5 +1,6 @@
 #include "base.h"
 #include "Scene.h"
+#include "AssetManager.h"
 
 class GameEngine 
 {
@@ -10,9 +11,12 @@ public:
 	void run();
 	void quit();
 
+	sf::RenderWindow & getWindow();
+	AssetManager _assets;
+
 protected:
 	
-	sf::Window _window;
+	sf::RenderWindow _window;
 	bool _isRunning;
 	std::string _activeScene;
 	std::string _previousScene;
@@ -21,5 +25,6 @@ protected:
 	void init();
 	void update();
 	void handleInput();
+	AssetManager getAssets();
 
 };

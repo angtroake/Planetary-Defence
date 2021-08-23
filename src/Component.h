@@ -14,6 +14,14 @@ namespace Component {
 	{
 	public:
 		Transform() {}
+		Transform(Vec2 pos, Vec2 vel, bool rot) : position(pos), velocity(vel), rotates(rot) {}
+
+		Vec2 position;
+		Vec2 prevPosition;
+		Vec2 velocity;
+		Vec2 prevVelocity;
+		Vec2 direction;
+		bool rotates;
 	};
 }
 

@@ -14,6 +14,8 @@ void GameEngine::init()
 	_window.create(sf::VideoMode(1280, 720), "GameJam");
 	_window.setFramerateLimit(60);
 
+	_assets.init();
+
 	changeScene(std::make_shared<Scene_Main_Menu>(this), "MAIN_MENU", false);
 }
 
@@ -96,4 +98,14 @@ void GameEngine::changeScene(std::shared_ptr<Scene> scene, const std::string& na
 std::shared_ptr<Scene> GameEngine::getActiveScene() 
 {
 	return _sceneMap[_activeScene];
+}
+
+sf::RenderWindow & GameEngine::getWindow()
+{
+	return _window;
+}
+
+AssetManager GameEngine::getAssets() 
+{
+	return _assets;
 }
