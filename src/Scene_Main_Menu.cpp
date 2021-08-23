@@ -14,7 +14,9 @@ void Scene_Main_Menu::init()
 	registerKeyAction(sf::Keyboard::Down, "DOWN");
 	registerKeyAction(sf::Keyboard::Down, "UP");
 
-	
+	auto earth = _entityManager.createEntity("Earth");
+	_entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindowSize().x/2, 600), Vec2(0,0), false);
+	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 } 
 
 
@@ -36,6 +38,17 @@ void Scene_Main_Menu::render()
 	_engine->getWindow().draw(text);
 
 
+	for (auto entity : _entityManager.getEntities()) 
+	{
+		if (_entityManager.hasComponent<Component::Material>(entity)) 
+		{
+			auto& mat = _entityManager.getComponent<Component::Material>(entity);
+			auto& transfrom = _entityManager.getComponent<Component::Transform>(entity);
+
+			mat.sprite.get().setPosition(transfrom.position.x - mat.sprite.getSize().x/2, transfrom.position.y - mat.sprite.getSize().y / 2);
+			_engine->getWindow().draw(mat.sprite.get());
+		}
+	}
 
 
 }
@@ -43,6 +56,19 @@ void Scene_Main_Menu::render()
 void Scene_Main_Menu::tick() 
 {
 	_entityManager.update();
+
+	for (auto entity : _entityManager.getEntities()) 
+	{
+		if (_entityManager.hasComponent<Component::Material>(entity)) 
+		{
+			auto& mat = _entityManager.getComponent<Component::Material>(entity);
+			mat.sprite.animate();
+			if (mat.sprite.ended() && !mat.repeat) 
+			{
+				_entityManager.destroyEntity(entity);
+			}
+		}
+	}
 }
 
 void Scene_Main_Menu::onKeyAction(std::string actionName, KeyAction action)

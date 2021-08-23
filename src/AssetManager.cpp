@@ -7,7 +7,7 @@ void AssetManager::init()
 	addFont("Crater", "assets/fonts/Crater.otf");
 
 	addTexture("Earth", "assets/img/earth16bit.png");
-	createSprite("Earth", getTexture("Earth"), 16, 16, 250, true, 1);
+	createSprite("Earth", getTexture("Earth"), 16, 16, 250, 4);
 }
 
 void AssetManager::addFont(const std::string name, const std::string path) 
@@ -39,13 +39,13 @@ void AssetManager::addTexture(const std::string& name, const std::string& path)
 
 void AssetManager::createSprite(const std::string& name, const sf::Texture& texture)
 {
-	createSprite(name, texture, 1, 1, 1, true, 1);
+	createSprite(name, texture, 1, 1, 1, 1);
 }
 
-void AssetManager::createSprite(const std::string& name, const sf::Texture& texture, size_t sheetX, size_t sheetY, uint32_t frameCount, bool repeat, uint32_t speed)
+void AssetManager::createSprite(const std::string& name, const sf::Texture& texture, size_t sheetX, size_t sheetY, uint32_t frameCount, uint32_t speed)
 {
 	
-	Sprite spr(texture, sheetX, sheetY, frameCount, repeat, speed);
+	Sprite spr(texture, sheetX, sheetY, frameCount, speed);
 	_sprites[name] = spr;
 }
 
@@ -59,4 +59,10 @@ const sf::Font& AssetManager::getFont(const std::string& name) const
 {
 	assert(_fonts.find(name) != _fonts.end());
 	return _fonts.at(name);
+}
+
+const Sprite& AssetManager::getSprite(const std::string& name) const
+{
+	assert(_sprites.find(name) != _sprites.end());
+	return _sprites.at(name);
 }

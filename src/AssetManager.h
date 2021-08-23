@@ -10,7 +10,7 @@ private:
 	void addFont(const std::string name, const std::string path);
 	void addTexture(const std::string& name, const std::string& path);
 	void createSprite(const std::string& name, const sf::Texture& texture);
-	void createSprite(const std::string& name, const sf::Texture& texture, size_t sheetX, size_t sheetY, uint32_t frameCount, bool repeat, uint32_t speed);
+	void createSprite(const std::string& name, const sf::Texture& texture, size_t sheetX, size_t sheetY, uint32_t frameCount, uint32_t speed);
 
 public:
 	AssetManager() {}

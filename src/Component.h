@@ -1,5 +1,6 @@
 #pragma once
 #include "base.h"
+#include "Sprite.h"
 
 const int MAX_COMPONENTS = 32;
 
@@ -22,6 +23,16 @@ namespace Component {
 		Vec2 prevVelocity;
 		Vec2 direction;
 		bool rotates;
+	};
+
+	class Material : public Component 
+	{
+	public:
+		Material() {}
+		Material(Sprite spr, bool repeat): sprite(spr), repeat(repeat) {}
+		
+		Sprite sprite;
+		bool repeat;
 	};
 }
 
