@@ -35,7 +35,7 @@ void GameEngine::update()
 
 	if (!_isRunning) { return; }
 
-	_sceneMap[_activeScene]->tick();
+	_sceneMap[_activeScene]->simulate(SIM_SPEED);
 	_sceneMap[_activeScene]->render();
 
 	_window.display();

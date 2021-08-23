@@ -12,13 +12,15 @@ protected:
 	EntityManager _entityManager;
 
 	std::map<int, std::string> _keyActionMap;
+	virtual void tick() = 0;
 
 public:
 	Scene() {}
 	Scene(GameEngine* engine);
-	virtual void tick() = 0;
 	virtual void render() = 0;
 	virtual void init() = 0;
+	void simulate(const int frames);
+	void renderEntity(const int& entity);
 	
 	virtual void onKeyAction(std::string actionName, KeyAction action) = 0;
 

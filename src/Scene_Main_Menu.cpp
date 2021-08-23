@@ -40,14 +40,7 @@ void Scene_Main_Menu::render()
 
 	for (auto entity : _entityManager.getEntities()) 
 	{
-		if (_entityManager.hasComponent<Component::Material>(entity)) 
-		{
-			auto& mat = _entityManager.getComponent<Component::Material>(entity);
-			auto& transfrom = _entityManager.getComponent<Component::Transform>(entity);
-
-			mat.sprite.get().setPosition(transfrom.position.x - mat.sprite.getSize().x/2, transfrom.position.y - mat.sprite.getSize().y / 2);
-			_engine->getWindow().draw(mat.sprite.get());
-		}
+		renderEntity(entity);
 	}
 
 
