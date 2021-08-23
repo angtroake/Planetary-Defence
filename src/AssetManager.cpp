@@ -7,7 +7,7 @@ void AssetManager::init()
 	addFont("Crater", "assets/fonts/Crater.otf");
 
 	addTexture("Earth", "assets/img/earth16bit.png");
-	createSprite("Earth", getTexture("Earth"), 16, 16, 250, 4);
+	createSprite("Earth", getTexture("Earth"), 16, 16, 250, 8);
 }
 
 void AssetManager::addFont(const std::string name, const std::string path) 

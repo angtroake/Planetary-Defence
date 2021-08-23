@@ -15,7 +15,7 @@ void Scene_Main_Menu::init()
 	registerKeyAction(sf::Keyboard::Down, "UP");
 
 	auto earth = _entityManager.createEntity("Earth");
-	_entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindowSize().x/2, 600), Vec2(0,0), false);
+	_entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindowSize().x/2, _engine->getWindowSize().y), Vec2(0,0), Vec2(5,5), false);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 } 
 

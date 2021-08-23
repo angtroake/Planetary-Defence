@@ -32,7 +32,8 @@ void Scene::renderEntity(const int & entity)
 		auto& mat = _entityManager.getComponent<Component::Material>(entity);
 		auto& transfrom = _entityManager.getComponent<Component::Transform>(entity);
 
-		mat.sprite.get().setPosition(transfrom.position.x - mat.sprite.getSize().x / 2, transfrom.position.y - mat.sprite.getSize().y / 2);
+		mat.sprite.get().setPosition(transfrom.position.x - (mat.sprite.getSize().x * transfrom.scale.x) / 2, transfrom.position.y - (mat.sprite.getSize().y * transfrom.scale.y) / 2);
+		mat.sprite.get().setScale({ transfrom.scale.x, transfrom.scale.y });
 		_engine->getWindow().draw(mat.sprite.get());
 	}
 }
