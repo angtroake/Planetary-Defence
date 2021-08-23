@@ -10,9 +10,10 @@ public:
 	void changeScene(std::shared_ptr<Scene> scene, const std::string & name, bool endScene);
 	void run();
 	void quit();
+	AssetManager & getAssets();
 
 	sf::RenderWindow & getWindow();
-	AssetManager _assets;
+	const sf::Vector2u & getWindowSize() const;
 
 protected:
 	
@@ -21,10 +22,10 @@ protected:
 	std::string _activeScene;
 	std::string _previousScene;
 	std::map<std::string, std::shared_ptr<Scene>> _sceneMap;
+	AssetManager _assets;
 
 	void init();
 	void update();
 	void handleInput();
-	AssetManager getAssets();
 
 };

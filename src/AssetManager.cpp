@@ -34,14 +34,14 @@ void AssetManager::addTexture(const std::string& name, const std::string& path)
 	}
 }
 
-sf::Texture& AssetManager::getTexture(const std::string& name) 
+const sf::Texture& AssetManager::getTexture(const std::string& name) const
 {
 	assert(_textures.find(name) != _textures.end());
-	return _textures[name];
+	return _textures.at(name);
 }
 
-sf::Font& AssetManager::getFont(const std::string& name)
+const sf::Font& AssetManager::getFont(const std::string& name) const
 {
 	assert(_fonts.find(name) != _fonts.end());
-	return _fonts[name];
+	return _fonts.at(name);
 }

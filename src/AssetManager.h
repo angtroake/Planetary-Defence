@@ -11,6 +11,6 @@ private:
 public:
 	AssetManager() {}
 	void init();
-	sf::Texture& getTexture(const std::string& name);
-	sf::Font& getFont(const std::string& name);
+	const sf::Texture& getTexture(const std::string& name) const;
+	const sf::Font& getFont(const std::string& name) const;
 };

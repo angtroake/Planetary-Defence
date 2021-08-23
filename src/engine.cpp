@@ -105,7 +105,12 @@ sf::RenderWindow & GameEngine::getWindow()
 	return _window;
 }
 
-AssetManager GameEngine::getAssets() 
+AssetManager & GameEngine::getAssets() 
 {
 	return _assets;
+}
+
+const sf::Vector2u & GameEngine::getWindowSize() const 
+{
+	return _window.getSize();
 }

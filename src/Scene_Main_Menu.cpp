@@ -24,6 +24,20 @@ void Scene_Main_Menu::render()
 	_engine->getWindow().setView(_engine->getWindow().getDefaultView());
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
+	//Draw Title
+	sf::Text text;
+	text.setFont(_engine->getAssets().getFont("Crater"));
+	text.setCharacterSize(48);
+	text.setFillColor(sf::Color(255, 255, 255));
+	text.setString("Planetary Defence!");
+	sf::FloatRect textRect = text.getLocalBounds();
+	text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+	text.setPosition({_engine->getWindowSize().x/2.0f, 60});
+	_engine->getWindow().draw(text);
+
+
+
+
 }
 
 void Scene_Main_Menu::tick() 
