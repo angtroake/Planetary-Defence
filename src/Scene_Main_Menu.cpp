@@ -89,7 +89,7 @@ void Scene_Main_Menu::tick()
 
 void Scene_Main_Menu::onKeyAction(std::string actionName, KeyAction action)
 {
-	if (actionName == "QUIT") { _engine->quit(); }
+	if (actionName == "QUIT" && action.type == ActionType::KEY_PRESS) { _engine->quit(); }
 	else if (actionName == "DOWN" && action.type == ActionType::KEY_PRESS) 
 	{
 		selectedMenuButton = (selectedMenuButton + menuButtonCount + 1) % menuButtonCount;

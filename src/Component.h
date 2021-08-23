@@ -2,6 +2,7 @@
 #include "base.h"
 #include "Sprite.h"
 
+
 const int MAX_COMPONENTS = 32;
 
  
@@ -47,6 +48,19 @@ namespace Component {
 		size_t health;
 		size_t maxHealth;
 
+	};
+
+	class Orbit : public Component
+	{
+	public:
+		Orbit() {}
+		Orbit(Entity target, float distance, float speed, bool cw): target(target), distance(distance), speed(speed), clockWise(cw) {}
+
+		Entity target;
+		float distance;
+		float speed;
+		bool clockWise;
+		float currentAngle = 0;
 	};
 }
 

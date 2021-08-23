@@ -5,17 +5,17 @@
 #include "Component.h"
 
 
-typedef uint32_t Entity;
 
 //Max amount of entities allowed in a scene.
-const Entity MAX_ENTITIES = 10000;
+const Entity MAX_ENTITIES = 1000;
 
 //Tuple containing all possible components
 //Components must be added to this tuple to be usable with entities.
 typedef std::tuple<
 	Component::Transform[MAX_ENTITIES],
 	Component::Material[MAX_ENTITIES],
-	Component::Health[MAX_ENTITIES]
+	Component::Health[MAX_ENTITIES],
+	Component::Orbit[MAX_ENTITIES]
 > ComponentArrays;
 
 
@@ -162,6 +162,18 @@ public:
 	std::vector<Entity> getEntities() 
 	{
 		return _entities;
+	}
+
+	const bool isAlive(const Entity & entity)
+	{
+		assert(entity < MAX_ENTITIES);
+		return (std::find(_entities.begin(), _entities.end(), entity) != _entities.end());
+	}
+
+	const std::string& getTag(const Entity& entity) const 
+	{
+		assert(entity < MAX_ENTITIES);
+		return _entityTags[entity];
 	}
 
 };
