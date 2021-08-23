@@ -34,6 +34,13 @@ void Scene::renderEntity(const int & entity)
 
 		mat.sprite.get().setPosition(transfrom.position.x - (mat.sprite.getSize().x * transfrom.scale.x) / 2, transfrom.position.y - (mat.sprite.getSize().y * transfrom.scale.y) / 2);
 		mat.sprite.get().setScale({ transfrom.scale.x, transfrom.scale.y });
-		_engine->getWindow().draw(mat.sprite.get());
+		if (mat.fragShader != nullptr) 
+		{
+			_engine->getWindow().draw(mat.sprite.get(), &*mat.fragShader);
+		}
+		else
+		{
+			_engine->getWindow().draw(mat.sprite.get());
+		}
 	}
 }

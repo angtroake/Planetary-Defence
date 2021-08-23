@@ -18,9 +18,12 @@ void Scene_Play::init()
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 	_entityManager.addComponent<Component::Health>(earth, 100);
 
+	//Shader Test Fail
+	/*
 	auto test = _entityManager.createEntity("Test");
 	_entityManager.addComponent<Component::Transform>(test, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
 	_entityManager.addComponent<Component::Orbit>(test, earth, 300, 0.01, true);
+	*/
 }
 
 void Scene_Play::tick()
@@ -81,6 +84,8 @@ void Scene_Play::render()
 	{
 		renderEntity(entity);
 
+		//SHADER TEST FAILED
+		/*
 		if (_entityManager.getTag(entity) == "Test") 
 		{
 			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
@@ -90,6 +95,7 @@ void Scene_Play::render()
 			rect.setSize({ 50,50 });
 			_engine->getWindow().draw(rect);
 		}
+		*/
 	}
 }
 

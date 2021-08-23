@@ -35,6 +35,7 @@ namespace Component {
 		
 		Sprite sprite;
 		bool repeat;
+		std::shared_ptr<sf::Shader> fragShader = nullptr;
 	};
 
 	class Health : public Component

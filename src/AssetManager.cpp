@@ -8,6 +8,9 @@ void AssetManager::init()
 
 	addTexture("Earth", "assets/img/earth16bit.png");
 	createSprite("Earth", getTexture("Earth"), 16, 16, 250, 8);
+
+	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
+	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
 }
 
 void AssetManager::addFont(const std::string name, const std::string path) 
@@ -49,6 +52,36 @@ void AssetManager::createSprite(const std::string& name, const sf::Texture& text
 	_sprites[name] = spr;
 }
 
+void AssetManager::addShader(const std::string& name, const std::string path, const ShaderType type)
+{
+	if (type == ShaderType::FRAGMENT) 
+	{
+		std::shared_ptr<sf::Shader> shader = std::make_shared<sf::Shader>();
+		if (!shader->loadFromFile(path, sf::Shader::Fragment)) 
+		{
+			std::cerr << "Failed to load shader: " << path << std::endl;
+			shader.reset();
+		}
+		else 
+		{
+			_shaders[name] = shader;
+		}
+	}
+	else if (type == ShaderType::VERTEX) 
+	{
+		std::shared_ptr<sf::Shader> shader = std::make_shared<sf::Shader>();
+		if (!shader->loadFromFile(path, sf::Shader::Vertex))
+		{
+			std::cerr << "Failed to load shader: " << path << std::endl;
+			shader.reset();
+		}
+		else
+		{
+			_shaders[name] = shader;
+		}
+	}
+}
+
 const sf::Texture& AssetManager::getTexture(const std::string& name) const
 {
 	assert(_textures.find(name) != _textures.end());
@@ -65,4 +98,10 @@ const Sprite& AssetManager::getSprite(const std::string& name) const
 {
 	assert(_sprites.find(name) != _sprites.end());
 	return _sprites.at(name);
+}
+
+const std::shared_ptr<sf::Shader> & AssetManager::getShader(const std::string& name) const
+{
+	assert(_shaders.find(name) != _shaders.end());
+	return _shaders.at(name);
 }
