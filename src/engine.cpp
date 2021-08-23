@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "Scene_Main_Menu.h"
+#include <iostream>
 
 GameEngine::GameEngine()
 {
@@ -83,8 +84,10 @@ void GameEngine::changeScene(std::shared_ptr<Scene> scene, const std::string& na
 	{
 		if (_sceneMap.find(name) == _sceneMap.end()) 
 		{
+			std::cerr << "Scene " << name << " does not exist!" << std::endl;
 			return;
 		}
+
 	}
 
 	if (endScene) 

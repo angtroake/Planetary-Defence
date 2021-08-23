@@ -35,6 +35,19 @@ namespace Component {
 		Sprite sprite;
 		bool repeat;
 	};
+
+	class Health : public Component
+	{
+	public:
+		Health() {}
+		Health(size_t maxHealth): health(maxHealth), maxHealth(maxHealth) {}
+		
+		void damage(size_t amount) { health -= amount; }
+
+		size_t health;
+		size_t maxHealth;
+
+	};
 }
 
 

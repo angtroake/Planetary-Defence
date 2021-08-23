@@ -14,7 +14,8 @@ const Entity MAX_ENTITIES = 10000;
 //Components must be added to this tuple to be usable with entities.
 typedef std::tuple<
 	Component::Transform[MAX_ENTITIES],
-	Component::Material[MAX_ENTITIES]
+	Component::Material[MAX_ENTITIES],
+	Component::Health[MAX_ENTITIES]
 > ComponentArrays;
 
 

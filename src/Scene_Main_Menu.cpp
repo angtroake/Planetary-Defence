@@ -1,5 +1,6 @@
 #include "Scene_Main_Menu.h"
 #include "engine.h"
+#include "Scene_Play.h"
 #include <iostream>
 
 Scene_Main_Menu::Scene_Main_Menu(GameEngine* engine) 
@@ -102,7 +103,7 @@ void Scene_Main_Menu::onKeyAction(std::string actionName, KeyAction action)
 		//Play Button
 		if (selectedMenuButton == 0) 
 		{
-			
+			_engine->changeScene(std::make_shared<Scene_Play>(_engine), "PLAY", false);
 		}
 		//Options Screen
 		else if (selectedMenuButton == 1) 
