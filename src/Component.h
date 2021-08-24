@@ -82,6 +82,31 @@ namespace Component {
 		Vec2 size;
 		Vec2 halfSize;
 	};
+
+	class Rope : public Component
+	{
+	public:
+		Rope() {}
+		Rope(size_t ropeLength, float segmentDistance, Vec2 anchor, Vec2* position, Vec2 positionOffset) : ropeLength(ropeLength), segmentDistance(segmentDistance), anchor(anchor), position(position), positionOffset(positionOffset)
+		{
+			Vec2 dir = (*position - anchor)/segmentDistance;
+			for (size_t i = 0; i < ropeLength; i++) 
+			{
+				segmentPositions.push_back(anchor + (dir * i));
+				prevSegmentPositions.push_back(anchor + (dir * i));
+			}
+			segmentPositions[ropeLength - 1] = *position;
+			prevSegmentPositions[ropeLength - 1] = *position;
+		}
+
+		Vec2 anchor;
+		Vec2* position;
+		Vec2 positionOffset;
+		std::vector<Vec2> segmentPositions;
+		std::vector<Vec2> prevSegmentPositions;
+		size_t ropeLength;
+		float segmentDistance;
+	};
 }
 
 
