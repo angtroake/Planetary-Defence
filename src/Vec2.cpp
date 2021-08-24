@@ -49,3 +49,10 @@ float Vec2::mag() const
 {
     return sqrt(x * x + y * y);
 }
+
+float Vec2::angle(const Vec2& rhs) const
+{
+    float dot = x * rhs.x + y * rhs.y;
+    float det = x * rhs.y - y * rhs.x;
+    return atan2(det, dot);
+}

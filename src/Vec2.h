@@ -20,5 +20,6 @@ public:
 
 	float dist(const Vec2& rhs) const;
 	float mag() const;
+	float angle(const Vec2& rhs) const;
 };
 

@@ -20,13 +20,14 @@ void Scene_Play::init()
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid2"));
 
 	earth = _entityManager.createEntity("Earth");
-	_entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2, _engine->getWindow().getSize().y / 2), Vec2(0,0), Vec2(1,1), false);
+	auto & transfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -100), Vec2(0,0), Vec2(1,1), false);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 	_entityManager.addComponent<Component::Health>(earth, 100);
 	_entityManager.addComponent<Component::BoundingBox>(earth, Vec2(256, 256));
-	std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
-	ani->init(earth, _entityManager);
-	_entityManager.addComponent<Component::CAnimation>(earth, ani);
+	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
+	//ani->init(earth, _entityManager);
+	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
+	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position);
 
 	//Shader Test Fail
 	/*
@@ -70,6 +71,55 @@ void Scene_Play::tick()
 				transform.prevVelocity = transform.velocity;
 				transform.velocity = vec - transform.position;
 			}
+		}
+
+		//Rope Update
+		if (_entityManager.hasComponent<Component::Rope>(entity)) 
+		{
+			auto& rope = _entityManager.getComponent<Component::Rope>(entity);
+			
+			for (int i = 1; i < rope.ropeLength; i++) 
+			{
+				Vec2 vel = rope.segmentPositions[i] - rope.prevSegmentPositions[i];
+				rope.prevSegmentPositions[i] = rope.segmentPositions[i];
+
+				vel.y += GRAVITY;
+				vel = vel * 0.98f;
+				rope.segmentPositions[i] = rope.segmentPositions[i] + vel;
+
+			}
+
+			for (int j = 0; j < 30; j++) {
+				for (int i = 1; i < rope.ropeLength; i++)
+				{
+					//rope constraints
+					Vec2 dir = rope.segmentPositions[i - 1] - rope.segmentPositions[i];
+					dir = dir / dir.mag();
+
+					float d = rope.segmentPositions[i].dist(rope.segmentPositions[i - 1]);
+					float err = d - rope.segmentDistance;
+
+
+					if (i == 1) 
+					{
+						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
+					}
+					else 
+					{
+						rope.segmentPositions[i - 1] = rope.segmentPositions[i - 1] - (dir * err * 0.8f);
+						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
+					}
+
+					/*
+					if (err > 0) {
+						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err * 0.6f);
+						rope.prevSegmentPositions[i] = rope.prevSegmentPositions[i] + (dir * err * 0.6f);
+					}
+					*/
+				}
+			}
+
+			*rope.position = rope.segmentPositions[rope.ropeLength - 1];
 		}
 
 		handleAnimations(entity);
