@@ -95,10 +95,35 @@ void Scene_Play::render()
 	_engine->getWindow().setView(_engine->getWindow().getDefaultView());
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
-	for (auto entity : _entityManager.getEntities()) 
+	for (auto entity : _entityManager.getEntities())
 	{
 		renderEntity(entity, renderDebug);
 	}
+
+	renderHealth();
+}
+
+void Scene_Play::renderHealth()
+{
+	//Draw Title
+	sf::Text text;
+	text.setFont(_engine->getAssets().getFont("Crater"));
+	text.setCharacterSize(36);
+	text.setFillColor(sf::Color(255, 255, 255));
+	text.setString("Health");
+	Util::centerText(text);
+	text.setPosition({ _engine->getWindowSize().x - 20.0f - (_engine->getWindowSize().x / 8.0f), 20 });
+	_engine->getWindow().draw(text);
+
+	//Health Bar
+	sf::RectangleShape rect;
+	rect.setSize({ _engine->getWindowSize().x / 4.0f, _engine->getWindowSize().y / 25.0f });
+	rect.setOutlineColor(sf::Color(255, 255, 255));
+	rect.setFillColor(sf::Color(255, 0, 0));
+	rect.setOutlineThickness(5);
+	rect.setOrigin(_engine->getWindowSize().x / 4.0f, 0);
+	rect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
+	_engine->getWindow().draw(rect);
 }
 
 void Scene_Play::handleCollisions()

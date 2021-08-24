@@ -21,6 +21,7 @@ public:
 	Scene_Play(GameEngine* engine);
 	void tick();
 	void render();
+	void renderHealth();
 	void init();
 	void onKeyAction(std::string actionName, KeyAction action);
 
