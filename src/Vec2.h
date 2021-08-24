@@ -19,5 +19,6 @@ public:
 	float operator * (const Vec2& rhs) const;
 
 	float dist(const Vec2& rhs) const;
+	float mag() const;
 };
 

@@ -11,6 +11,12 @@ protected:
 
 	std::vector<Sprite> _asteroidSprites;
 
+	bool renderDebug = false;
+
+	void handleCollisions();
+	void handleMovement(Entity entity);
+	void handleAnimations(Entity entity);
+
 public:
 	Scene_Play(GameEngine* engine);
 	void tick();

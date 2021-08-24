@@ -72,6 +72,16 @@ namespace Component {
 
 		std::shared_ptr<Animation> animation;
 	};
+
+	class BoundingBox : public Component 
+	{
+	public:
+		BoundingBox() {}
+		BoundingBox(Vec2 size): size(size), halfSize(size/2.0f) {}
+
+		Vec2 size;
+		Vec2 halfSize;
+	};
 }
 
 

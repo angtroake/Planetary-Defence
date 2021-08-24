@@ -15,6 +15,8 @@ const float PI = 3.14159265;
 const float GRAVITY = 0.5;
 const float MAXFALL = 20;
 
+const bool DEBUG = true;
+
 typedef uint32_t Entity;
 
 namespace Util
