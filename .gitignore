@@ -5,6 +5,8 @@
 
 #custom
 **/earth_out/*
+**/asteroids_out/*
+**/earth2_out/*
 
 # User-specific files
 *.rsuser

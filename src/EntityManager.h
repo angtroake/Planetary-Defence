@@ -9,13 +9,15 @@
 //Max amount of entities allowed in a scene.
 const Entity MAX_ENTITIES = 1000;
 
+
 //Tuple containing all possible components
 //Components must be added to this tuple to be usable with entities.
 typedef std::tuple<
 	Component::Transform[MAX_ENTITIES],
 	Component::Material[MAX_ENTITIES],
 	Component::Health[MAX_ENTITIES],
-	Component::Orbit[MAX_ENTITIES]
+	Component::Orbit[MAX_ENTITIES],
+	Component::CAnimation[MAX_ENTITIES]
 > ComponentArrays;
 
 
@@ -83,6 +85,16 @@ public:
 		return component;
 	}
 
+	//Remove component from an entity
+	template <typename T>
+	T& removeComponent(Entity entity) 
+	{
+		assert(entity < MAX_ENTITIES);
+		auto& component = getComponent<T>(entity);
+		component.has = false;
+		return component;
+	}
+
 	//True if entity has a component.
 	template <typename T>
 	const bool hasComponent(Entity entity) const 
@@ -92,6 +104,7 @@ public:
 	}
 
 	//Returns the instance of the entities component
+
 	template <typename T>
 	const T& getComponent(Entity entity) const
 	{

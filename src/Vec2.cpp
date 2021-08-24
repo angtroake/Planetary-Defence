@@ -1,4 +1,5 @@
 #include "Vec2.h"
+#include <math.h>
 
 Vec2::Vec2() : x(0), y(0) {}
 
@@ -37,4 +38,9 @@ bool Vec2::operator != (const Vec2& rhs) const
 float Vec2::operator * (const Vec2& rhs) const
 {
     return x * rhs.y - rhs.x * y;
+}
+
+float Vec2::dist(const Vec2& rhs) const
+{
+    return sqrtf((x - rhs.x) * (x - rhs.x) + (y - rhs.y) * (y - rhs.y));
 }

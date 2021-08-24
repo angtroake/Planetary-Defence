@@ -5,6 +5,7 @@ Sprite::Sprite(const sf::Texture& texture, size_t sheetX, size_t sheetY, uint32_
 {
 	_sprite = sf::Sprite(texture);
 	_textureSize = texture.getSize();
+	_sprite.setTextureRect(sf::IntRect(0 * getSize().x, 0 * getSize().y, getSize().x, getSize().y));
 }
 
 void Sprite::animate()

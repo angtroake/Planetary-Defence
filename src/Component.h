@@ -1,10 +1,10 @@
 #pragma once
 #include "base.h"
 #include "Sprite.h"
+#include "Animation.h"
 
 
 const int MAX_COMPONENTS = 32;
-
  
 namespace Component {
 	class Component{
@@ -62,6 +62,15 @@ namespace Component {
 		float speed;
 		bool clockWise;
 		float currentAngle = 0;
+	};
+
+	class CAnimation : public Component
+	{
+	public:
+		CAnimation(){}
+		CAnimation(std::shared_ptr<Animation> ani): animation(ani) {}
+
+		std::shared_ptr<Animation> animation;
 	};
 }
 

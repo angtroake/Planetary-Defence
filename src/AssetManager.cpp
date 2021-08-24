@@ -6,8 +6,14 @@ void AssetManager::init()
 {
 	addFont("Crater", "assets/fonts/Crater.otf");
 
-	addTexture("Earth", "assets/img/earth16bit.png");
-	createSprite("Earth", getTexture("Earth"), 16, 16, 250, 8);
+	addTexture("Earth", "assets/img/earth2_512.png");
+	createSprite("Earth", getTexture("Earth"), 20, 20, 400, 3);
+
+	//Asteroids
+	addTexture("Asteroid1", "assets/img/asteroid1.png");
+	createSprite("Asteroid1", getTexture("Asteroid1"), 16, 16, 250, 1);
+	addTexture("Asteroid2", "assets/img/asteroid2.png");
+	createSprite("Asteroid2", getTexture("Asteroid2"), 16, 16, 250, 1);
 
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);

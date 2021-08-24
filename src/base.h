@@ -9,7 +9,11 @@
 
 //Amount of frames per tick
 const size_t SIM_SPEED = 1;
+
 const float PI = 3.14159265;
+
+const float GRAVITY = 0.5;
+const float MAXFALL = 20;
 
 typedef uint32_t Entity;
 

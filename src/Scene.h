@@ -14,6 +14,8 @@ protected:
 	std::map<int, std::string> _keyActionMap;
 	virtual void tick() = 0;
 
+	size_t _currentFrame = 0;
+
 public:
 	Scene() {}
 	Scene(GameEngine* engine);

@@ -1,5 +1,6 @@
 #include "Scene_Play.h"
 #include "engine.h"
+#include <iostream>
 
 Scene_Play::Scene_Play(GameEngine* engine)
 {
@@ -12,11 +13,16 @@ void Scene_Play::init()
 {
 	registerKeyAction(sf::Keyboard::Escape, "EXIT");
 
+	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid1"));
+	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid2"));
 
 	earth = _entityManager.createEntity("Earth");
 	_entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2, _engine->getWindow().getSize().y / 2), Vec2(0,0), Vec2(1,1), false);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 	_entityManager.addComponent<Component::Health>(earth, 100);
+	std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
+	ani->init(earth, _entityManager);
+	_entityManager.addComponent<Component::CAnimation>(earth, ani);
 
 	//Shader Test Fail
 	/*
@@ -30,8 +36,15 @@ void Scene_Play::tick()
 {
 	_entityManager.update();
 
+
+	//Game Logic
+
+
+	//Entity Logic
 	for (auto entity : _entityManager.getEntities())
 	{
+
+		//Sprite Update
 		if (_entityManager.hasComponent<Component::Material>(entity))
 		{
 			auto& mat = _entityManager.getComponent<Component::Material>(entity);
@@ -42,6 +55,23 @@ void Scene_Play::tick()
 			}
 		}
 
+
+		//Aniamtion update
+		if (_entityManager.hasComponent<Component::CAnimation>(entity)) 
+		{
+			auto& animation = _entityManager.getComponent<Component::CAnimation>(entity);
+			if (!animation.animation->isFinished()) 
+			{
+				animation.animation->animateStep(entity, _entityManager);
+			}
+			else 
+			{
+				_entityManager.removeComponent<Component::CAnimation>(entity);
+			}
+		}
+
+
+		//Orbit Update
 		if (_entityManager.hasComponent<Component::Orbit>(entity)) 
 		{
 			auto& orbit = _entityManager.getComponent<Component::Orbit>(entity);
@@ -73,6 +103,17 @@ void Scene_Play::tick()
 			transform.position = transform.position + transform.velocity;
 		}
 	}
+
+	timeUntilAsteroid--;
+	if (timeUntilAsteroid == 0) 
+	{
+		spawnAsteroid();
+		timeUntilAsteroid = rand() % 600;
+	}
+
+
+	_currentFrame++;
+	timeAlive++;
 }
 
 void Scene_Play::render()
@@ -106,4 +147,25 @@ void Scene_Play::onKeyAction(std::string actionName, KeyAction action)
 	{
 		_engine->changeScene(nullptr, "MAIN_MENU", true);
 	}
+}
+
+void Scene_Play::spawnAsteroid()
+{
+	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+
+	float angle = (float)(rand() % 360) * PI / 180.0f;
+	Vec2 pos(500 * sin(angle), 500 * cos(angle));
+	pos = earthTransform.position + pos;
+	Vec2 vel = (earthTransform.position - pos) / pos.dist(earthTransform.position) * 0.5;
+
+	size_t sprite = rand() % _asteroidSprites.size();
+
+	auto entity = _entityManager.createEntity("Asteroid");
+	_entityManager.addComponent<Component::Transform>(entity, pos, vel, Vec2(1,1), false);
+	_entityManager.addComponent<Component::Health>(entity, 1);
+	_entityManager.addComponent<Component::Material>(entity, _asteroidSprites[sprite], true);
+	std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, pos.y, vel);
+	ani->init(entity, _entityManager);
+	_entityManager.addComponent<Component::CAnimation>(entity, ani);
+
 }
