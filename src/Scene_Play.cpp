@@ -27,7 +27,7 @@ void Scene_Play::init()
 	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
 	//ani->init(earth, _entityManager);
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
-	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position);
+	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, Vec2(0, 185));
 
 	//Shader Test Fail
 	/*
@@ -119,7 +119,7 @@ void Scene_Play::tick()
 				}
 			}
 
-			*rope.position = rope.segmentPositions[rope.ropeLength - 1];
+			*rope.position = rope.segmentPositions[rope.ropeLength - 1] + rope.positionOffset;
 		}
 
 		handleAnimations(entity);

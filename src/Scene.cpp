@@ -32,7 +32,7 @@ void Scene::renderEntity(const int & entity, bool debug)
 		auto& mat = _entityManager.getComponent<Component::Material>(entity);
 		auto& transfrom = _entityManager.getComponent<Component::Transform>(entity);
 
-		mat.sprite.get().setOrigin((mat.sprite.getSize().x * transfrom.scale.x) / 2, (mat.sprite.getSize().y * transfrom.scale.y) / 2);
+		mat.sprite.get().setOrigin((mat.sprite.getSize().x) / 2, (mat.sprite.getSize().y) / 2);
 		mat.sprite.get().setPosition(transfrom.position.x, transfrom.position.y);
 		mat.sprite.get().setScale({ transfrom.scale.x, transfrom.scale.y });
 		if (mat.fragShader != nullptr) 
