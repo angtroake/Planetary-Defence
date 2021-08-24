@@ -155,6 +155,8 @@ void Scene_Play::render()
 
 void Scene_Play::renderHealth()
 {
+	float healthBarLength = _engine->getWindowSize().x / 4.0f;
+
 	//Draw Title
 	sf::Text text;
 	text.setFont(_engine->getAssets().getFont("Crater"));
@@ -162,18 +164,18 @@ void Scene_Play::renderHealth()
 	text.setFillColor(sf::Color(255, 255, 255));
 	text.setString("Health");
 	Util::centerText(text);
-	text.setPosition({ _engine->getWindowSize().x - 20.0f - (_engine->getWindowSize().x / 8.0f), 20 });
+	text.setPosition({ _engine->getWindowSize().x - 20.0f - healthBarLength / 2, 20 });
 	_engine->getWindow().draw(text);
 
 	//Health Bar
-	sf::RectangleShape rect;
-	rect.setSize({ _engine->getWindowSize().x / 4.0f, _engine->getWindowSize().y / 25.0f });
-	rect.setOutlineColor(sf::Color(255, 255, 255));
-	rect.setFillColor(sf::Color(255, 0, 0));
-	rect.setOutlineThickness(5);
-	rect.setOrigin(_engine->getWindowSize().x / 4.0f, 0);
-	rect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
-	_engine->getWindow().draw(rect);
+	sf::RectangleShape healthRect;
+	healthRect.setSize({ healthBarLength, _engine->getWindowSize().y / 25.0f });
+	healthRect.setOutlineColor(sf::Color(255, 255, 255));
+	healthRect.setFillColor(sf::Color(255, 0, 0));
+	healthRect.setOutlineThickness(5);
+	healthRect.setOrigin(_engine->getWindowSize().x / 4.0f, 0);
+	healthRect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
+	_engine->getWindow().draw(healthRect);
 }
 
 void Scene_Play::handleCollisions()
