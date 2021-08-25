@@ -140,17 +140,30 @@ void Scene_Play::render()
 	_engine->getWindow().setView(_engine->getWindow().getDefaultView());
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
-	for (auto entity : _entityManager.getEntities()) 
-	{
-		renderEntity(entity, renderDebug, "Rope");
-		renderEntity(entity, renderDebug, "PopsicleStick");
-	}
-
+	//Render Before Earth
 	for (auto entity : _entityManager.getEntities())
 	{
-		renderEntity(entity, renderDebug, "Material");
-		renderEntity(entity, renderDebug, "BoundingBox");
-		renderEntity(entity, renderDebug, "CAnimation");
+		if (_entityManager.getTag(entity) != "Earth") 
+		{
+			renderEntity(entity, renderDebug, "PopsicleStick");
+		}
+	}
+	
+	//Render Earth
+	renderEntity(earth, renderDebug, "Rope");
+	renderEntity(earth, renderDebug, "Material");
+	renderEntity(earth, renderDebug, "BoundingBox");
+
+	//Render After Earth
+	for (auto entity : _entityManager.getEntities())
+	{
+		if (_entityManager.getTag(entity) != "Earth") 
+		{
+			renderEntity(entity, renderDebug, "Rope");
+			renderEntity(entity, renderDebug, "Material");
+			renderEntity(entity, renderDebug, "BoundingBox");
+			renderEntity(entity, renderDebug, "CAnimation");
+		}
 	}
 
 	renderHealth();
