@@ -21,6 +21,9 @@ void AssetManager::init()
 	addTexture("GammaRay", "assets/img/gamma.png");
 	createSprite("GammaRay", getTexture("GammaRay"), 5, 1, 5, 6);
 
+	//Sheild
+	addTexture("Shield", "assets/img/shield.png");
+	createSprite("Shield", getTexture("Shield"), 1, 8, 8, 3);
 
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);

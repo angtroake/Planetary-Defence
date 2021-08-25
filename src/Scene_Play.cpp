@@ -40,9 +40,10 @@ void Scene_Play::init()
 
 	shield = _entityManager.createEntity("Shield");
 	_entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
+	_entityManager.addComponent<Component::Material>(shield, _engine->getAssets().getSprite("Shield"), true);
 	_entityManager.addComponent<Component::Orbit>(shield, earth, 300, 0.01, true);
 	_entityManager.addComponent<Component::Input>(shield);
-	_entityManager.addComponent<Component::BoundingBox>(shield, Vec2(50, 50));
+	_entityManager.addComponent<Component::BoundingBox>(shield, Vec2(250, 50));
 }
 
 void Scene_Play::tick()
@@ -144,12 +145,13 @@ void Scene_Play::render()
 
 		if (_entityManager.getTag(entity) == "Shield")
 		{
-			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+			/*auto& transform = _entityManager.getComponent<Component::Transform>(entity);
 			sf::RectangleShape rect;
 			rect.setPosition({ transform.position.x - 25, transform.position.y - 25 });
 			rect.setFillColor(sf::Color(255, 255, 255));
 			rect.setSize({ 50,50 });
 			_engine->getWindow().draw(rect);
+			*/
 		}
 	}
 
@@ -206,8 +208,7 @@ void Scene_Play::handleCollisions()
 		//If asteroid is dropping down don't do collisions
 		if (_entityManager.hasComponent<Component::CAnimation>(entity)) { continue; }
 
-		Vec2 overlap = Physics::getOverlap(_entityManager, entity, earth);
-		if (overlap.x > 0 && overlap.y > 0) 
+		if (Physics::isColliding(_entityManager, entity, earth))
 		{
 			_entityManager.destroyEntity(entity);
 			_entityManager.getComponent<Component::Health>(earth).damage(1);
@@ -218,8 +219,7 @@ void Scene_Play::handleCollisions()
 			}
 		}
 
-		overlap = Physics::getOverlap(_entityManager, entity, shield);
-		if (overlap.x > 0 && overlap.y > 0)
+		if (Physics::isColliding(_entityManager, entity, shield))
 		{
 			_entityManager.destroyEntity(entity);
 		}
@@ -249,7 +249,11 @@ void Scene_Play::handleMovement(Entity entity)
 		{
 			transform.prevPosition = transform.position;
 			transform.position = transform.position + transform.velocity;
-			transform.direction = transform.velocity / transform.velocity.mag();
+
+			if (!_entityManager.hasComponent<Component::Orbit>(entity)) {
+				transform.direction = transform.velocity / transform.velocity.mag();
+			}
+
 		}
 
 	}
@@ -288,6 +292,8 @@ void Scene_Play::handleOrbit(Entity entity)
 
 			transform.prevVelocity = transform.velocity;
 			transform.velocity = vec - transform.position;
+			transform.direction = transform.position - target_transform.position;
+			transform.direction = transform.direction / transform.direction.mag();
 		}
 	}
 }
@@ -401,7 +407,7 @@ void Scene_Play::spawnAsteroid()
 	auto& transform = _entityManager.addComponent<Component::Transform>(entity, Vec2(pos.x + 10, -100), vel, Vec2(1,1), true);
 	_entityManager.addComponent<Component::Health>(entity, 1);
 	auto & mat = _entityManager.addComponent<Component::Material>(entity, _asteroidSprites[sprite], true);
-	_entityManager.addComponent<Component::BoundingBox>(entity, (mat.sprite.getSize()*0.6f));
+	_entityManager.addComponent<Component::BoundingBox>(entity, (mat.sprite.getSize()*0.4f));
 	
 	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 120);
 	ani->init(entity, _entityManager);
@@ -436,7 +442,7 @@ void Scene_Play::spawnGamma(Vec2 dir)
 	Vec2 gammaPos = earthTransform.position - dir*4000;
 	gammaPos = gammaPos + earthTransform.position;
 	Vec2 vel = earthTransform.position - gammaPos;
-	vel = vel / vel.mag() * 20.0f;
+	vel = vel / vel.mag() * 50.0f;
 
 
 	auto gamma = _entityManager.createEntity("GammaRay");
