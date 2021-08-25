@@ -208,7 +208,7 @@ void Scene_Play::handleCollisions()
 			_entityManager.destroyEntity(entity);
 			_entityManager.getComponent<Component::Health>(earth).damage(1);
 
-			if (_entityManager.getComponent<Component::Health>(earth).health == 0)
+			if (_entityManager.getComponent<Component::Health>(earth).health <= 0)
 			{
 				alive = false;
 			}
