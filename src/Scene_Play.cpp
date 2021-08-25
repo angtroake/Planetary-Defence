@@ -36,7 +36,7 @@ void Scene_Play::init()
 	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
 	//ani->init(earth, _entityManager);
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
-	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, Vec2(0, 185));
+	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, Vec2(0, 185), true);
 
 	auto test = _entityManager.createEntity("Test");
 	_entityManager.addComponent<Component::Transform>(test, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
@@ -80,7 +80,6 @@ void Scene_Play::tick()
 					float d = rope.segmentPositions[i].dist(rope.segmentPositions[i - 1]);
 					float err = d - rope.segmentDistance;
 
-
 					if (i == 1) 
 					{
 						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
@@ -90,13 +89,6 @@ void Scene_Play::tick()
 						rope.segmentPositions[i - 1] = rope.segmentPositions[i - 1] - (dir * err * 0.8f);
 						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
 					}
-
-					/*
-					if (err > 0) {
-						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err * 0.6f);
-						rope.prevSegmentPositions[i] = rope.prevSegmentPositions[i] + (dir * err * 0.6f);
-					}
-					*/
 				}
 			}
 
@@ -213,9 +205,17 @@ void Scene_Play::handleMovement(Entity entity)
 	if (_entityManager.hasComponent<Component::Transform>(entity))
 	{
 		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+		if (_entityManager.hasComponent<Component::Rope>(entity) && _entityManager.getComponent<Component::Rope>(entity).movementOnAnchor) 
+		{
+			auto& rope = _entityManager.getComponent<Component::Rope>(entity);
+			*rope.anchor = *rope.anchor + transform.velocity;
+		}
+		else 
+		{
+			transform.prevPosition = transform.position;
+			transform.position = transform.position + transform.velocity;
+		}
 
-		transform.prevPosition = transform.position;
-		transform.position = transform.position + transform.velocity;
 	}
 }
 
@@ -297,20 +297,25 @@ void Scene_Play::spawnAsteroid()
 {
 	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
 
-	float angle = (float)(rand() % 360) * PI / 180.0f;
-	Vec2 pos(500 * sin(angle), 500 * cos(angle));
+	float angle = 60.0f + (float)(rand() % 360) * PI / 180.0f;
+	Vec2 pos(700 * sin(angle), 700 * cos(angle));
 	pos = earthTransform.position + pos;
 	Vec2 vel = (earthTransform.position - pos) / pos.dist(earthTransform.position) * 0.5;
 
 	size_t sprite = rand() % _asteroidSprites.size();
 
 	auto entity = _entityManager.createEntity("Asteroid");
-	_entityManager.addComponent<Component::Transform>(entity, pos, vel, Vec2(1,1), false);
+	auto& transform = _entityManager.addComponent<Component::Transform>(entity, Vec2(pos.x + 10, -100), vel, Vec2(1,1), false);
 	_entityManager.addComponent<Component::Health>(entity, 1);
 	auto & mat = _entityManager.addComponent<Component::Material>(entity, _asteroidSprites[sprite], true);
 	_entityManager.addComponent<Component::BoundingBox>(entity, (mat.sprite.getSize()*0.6f));
-	std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, pos.y, vel);
+	
+	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 120);
 	ani->init(entity, _entityManager);
 	_entityManager.addComponent<Component::CAnimation>(entity, ani);
+
+	size_t ropeSegs = 20;
+	float segDist = (pos.y + _engine->getWindow().getSize().y / 2.0f) / ropeSegs;
+	_entityManager.addComponent<Component::Rope>(entity, ropeSegs, segDist,  Vec2(pos.x, -(float)_engine->getWindow().getSize().y/2.0f), &transform.position, Vec2(0,32), true);
 
 }
