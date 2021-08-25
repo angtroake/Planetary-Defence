@@ -17,5 +17,6 @@ public:
 	const bool ended() const;
 	const Vec2 getSize() const;
 	sf::Sprite& get();
+	sf::IntRect getCurrentFrame();
 };
 

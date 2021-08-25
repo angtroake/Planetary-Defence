@@ -31,10 +31,12 @@ namespace Component {
 	{
 	public:
 		Material() {}
-		Material(Sprite spr, bool repeat): sprite(spr), repeat(repeat) {}
-		
+		Material(Sprite spr, bool repeat) : Material(spr, repeat, sf::IntRect({ 0, 0 }, { (int)spr.getSize().x, (int)spr.getSize().y })) {}
+		Material(Sprite spr, bool repeat, sf::IntRect crop) : sprite(spr), repeat(repeat), crop(crop) {}
+
 		Sprite sprite;
 		bool repeat;
+		sf::IntRect crop;
 		std::shared_ptr<sf::Shader> fragShader = nullptr;
 	};
 

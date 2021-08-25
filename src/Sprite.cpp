@@ -21,6 +21,14 @@ void Sprite::animate()
 	_sprite.setTextureRect(sf::IntRect(frameX * getSize().x, frameY * getSize().y, getSize().x, getSize().y));
 }
 
+sf::IntRect Sprite::getCurrentFrame() 
+{
+	size_t frame = (_frame / _speed) % _frameCount;
+	size_t frameX = frame % _sheetX;
+	size_t frameY = int(frame / _sheetX) % _sheetY;
+	return sf::IntRect(frameX * getSize().x, frameY * getSize().y, getSize().x, getSize().y);
+}
+
 const bool Sprite::ended() const
 {
 	return _frame >= _frameCount * _speed;

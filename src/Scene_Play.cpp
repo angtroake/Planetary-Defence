@@ -238,7 +238,24 @@ void Scene_Play::handleCollisions()
 
 	for (Entity entity : _entityManager.getEntities("GammaRay")) 
 	{
-		if (Physics::isColliding(_entityManager, entity, earth))
+		auto& mat = _entityManager.getComponent<Component::Material>(entity);
+		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+		auto& shieldTransform = _entityManager.getComponent<Component::Transform>(shield);
+
+		std::cout << abs(((int)(abs(transform.direction.angle(shieldTransform.direction)) * 180.0f / PI) % 360) - 180) << std::endl;
+		if (Physics::isColliding(_entityManager, entity, shield) && abs(((int)(abs(transform.direction.angle(shieldTransform.direction)) * 180.0f / PI) % 360) - 180) < 90)
+		{
+			
+			mat.crop.top += transform.velocity.mag() / 6.0f;
+			mat.crop.height -= transform.velocity.mag() / 6.0f;
+			transform.position = transform.position - transform.velocity;
+			if (mat.crop.height <= 0) 
+			{
+				mat.crop.height = 0;
+				_entityManager.destroyEntity(entity);
+			}
+		} 
+		else if (Physics::isColliding(_entityManager, entity, earth))
 		{
 			auto& health = _entityManager.getComponent<Component::Health>(earth);
 			health.health -= health.maxHealth;
@@ -450,10 +467,8 @@ void Scene_Play::spawnGamma(Vec2 dir)
 {
 	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
 
-	Vec2 gammaPos = earthTransform.position - dir*4000;
-	gammaPos = gammaPos + earthTransform.position;
-	Vec2 vel = earthTransform.position - gammaPos;
-	vel = vel / vel.mag() * 50.0f;
+	Vec2 gammaPos = earthTransform.position - dir*2000;
+	Vec2 vel = dir * 40.0f;
 
 
 	auto gamma = _entityManager.createEntity("GammaRay");

@@ -36,6 +36,14 @@ void Scene::renderEntity(const int & entity, bool debug, std::string renderOnly)
 		mat.sprite.get().setPosition(transfrom.position.x, transfrom.position.y);
 		mat.sprite.get().setScale({ transfrom.scale.x, transfrom.scale.y });
 
+		sf::IntRect frame = mat.sprite.getCurrentFrame();
+		frame.top += mat.crop.top;
+		frame.left += mat.crop.left;
+		frame.width = mat.crop.width;
+		frame.height = mat.crop.height;
+
+		mat.sprite.get().setTextureRect(frame);
+
 		if (transfrom.rotates) 
 		{
 			mat.sprite.get().setRotation(Vec2(0, -1).angle(transfrom.direction) * 180.0f / PI);
