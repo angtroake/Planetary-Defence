@@ -22,7 +22,7 @@ public:
 	virtual void render() = 0;
 	virtual void init() = 0;
 	void simulate(const int frames);
-	void renderEntity(const int& entity, bool debug = false);
+	void renderEntity(const int& entity, bool debug = false, std::string renderOnly = "ALL");
 	
 	virtual void onKeyAction(std::string actionName, KeyAction action) = 0;
 

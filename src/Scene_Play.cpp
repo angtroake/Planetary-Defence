@@ -140,20 +140,17 @@ void Scene_Play::render()
 	_engine->getWindow().setView(_engine->getWindow().getDefaultView());
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
+	for (auto entity : _entityManager.getEntities()) 
+	{
+		renderEntity(entity, renderDebug, "Rope");
+		renderEntity(entity, renderDebug, "PopsicleStick");
+	}
+
 	for (auto entity : _entityManager.getEntities())
 	{
-		renderEntity(entity, renderDebug);
-
-		if (_entityManager.getTag(entity) == "Shield")
-		{
-			/*auto& transform = _entityManager.getComponent<Component::Transform>(entity);
-			sf::RectangleShape rect;
-			rect.setPosition({ transform.position.x - 25, transform.position.y - 25 });
-			rect.setFillColor(sf::Color(255, 255, 255));
-			rect.setSize({ 50,50 });
-			_engine->getWindow().draw(rect);
-			*/
-		}
+		renderEntity(entity, renderDebug, "Material");
+		renderEntity(entity, renderDebug, "BoundingBox");
+		renderEntity(entity, renderDebug, "CAnimation");
 	}
 
 	renderHealth();

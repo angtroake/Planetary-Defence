@@ -24,10 +24,10 @@ void Scene::simulate(const int frames)
 	}
 }
 
-void Scene::renderEntity(const int & entity, bool debug) 
+void Scene::renderEntity(const int & entity, bool debug, std::string renderOnly) 
 {
 	//Render Sprite of Entity
-	if (_entityManager.hasComponent<Component::Material>(entity))
+	if (_entityManager.hasComponent<Component::Material>(entity) && (renderOnly == "ALL" || renderOnly == "Material"))
 	{
 		auto& mat = _entityManager.getComponent<Component::Material>(entity);
 		auto& transfrom = _entityManager.getComponent<Component::Transform>(entity);
@@ -51,7 +51,7 @@ void Scene::renderEntity(const int & entity, bool debug)
 		}
 	}
 
-	if (debug && _entityManager.hasComponent<Component::BoundingBox>(entity)) 
+	if (debug && _entityManager.hasComponent<Component::BoundingBox>(entity) && (renderOnly == "ALL" || renderOnly == "BoundingBox"))
 	{
 		auto& boundingbox = _entityManager.getComponent<Component::BoundingBox>(entity);
 		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
@@ -70,7 +70,7 @@ void Scene::renderEntity(const int & entity, bool debug)
 		_engine->getWindow().draw(rect);
 	}
 
-	if (_entityManager.hasComponent<Component::Rope>(entity)) 
+	if (_entityManager.hasComponent<Component::Rope>(entity) && (renderOnly == "ALL" || renderOnly == "Rope"))
 	{
 		
 		auto& rope = _entityManager.getComponent<Component::Rope>(entity);
@@ -102,7 +102,7 @@ void Scene::renderEntity(const int & entity, bool debug)
 		}
 	}
 
-	if (debug && _entityManager.hasComponent<Component::CAnimation>(entity)) 
+	if (debug && _entityManager.hasComponent<Component::CAnimation>(entity) && (renderOnly == "ALL" || renderOnly == "CAnimation"))
 	{
 		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
 
@@ -114,7 +114,7 @@ void Scene::renderEntity(const int & entity, bool debug)
 		_engine->getWindow().draw(rect);
 	}
 
-	if (_entityManager.hasComponent<Component::PopsicleStick>(entity)) 
+	if (_entityManager.hasComponent<Component::PopsicleStick>(entity) && (renderOnly == "ALL" || renderOnly == "PopsicleStick"))
 	{
 		auto& stick = _entityManager.getComponent<Component::PopsicleStick>(entity);
 
