@@ -22,7 +22,7 @@ void Scene_Play::init()
 	earth = _entityManager.createEntity("Earth");
 	auto & transfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -100), Vec2(0,0), Vec2(1,1), false);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
-	_entityManager.addComponent<Component::Health>(earth, 1);
+	_entityManager.addComponent<Component::Health>(earth, 100);
 	_entityManager.addComponent<Component::BoundingBox>(earth, Vec2(256, 256));
 	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
 	//ani->init(earth, _entityManager);
