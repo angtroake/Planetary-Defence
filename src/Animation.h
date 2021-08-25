@@ -48,3 +48,15 @@ public:
 	Cooldown(GameEngine* gameEngine, size_t frames): frames(frames) { _engine = gameEngine; }
 };
 
+class AnimationBlink : public Animation
+{
+protected:
+	void animate(const Entity& entity, EntityManager& entityManager) override;
+	void setup(const Entity& entity, EntityManager& entityManager) override;
+
+	size_t interval;
+	size_t frames;
+public:
+	AnimationBlink(GameEngine* engine, size_t interval, size_t frames) : interval(interval), frames(frames) { _engine = engine; }
+};
+

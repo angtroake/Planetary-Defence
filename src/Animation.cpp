@@ -80,3 +80,23 @@ void Cooldown::setup(const Entity& entity, EntityManager& entityManager)
 {
 
 }
+
+void AnimationBlink::animate(const Entity& entity, EntityManager& entityManager)
+{
+	frames--;
+	if (entityManager.hasComponent<Component::Material>(entity)) 
+	{
+		auto& mat = entityManager.getComponent<Component::Material>(entity);
+
+		mat.sprite.get().setColor(sf::Color(255, 255, 255, 255 * (frames % interval) / interval));
+	}
+
+	if (frames <= 0) 
+	{
+		finish();
+	}
+}
+
+void AnimationBlink::setup(const Entity& entity, EntityManager& entityManager)
+{
+}

@@ -15,6 +15,10 @@ void AssetManager::init()
 	addTexture("Asteroid2", "assets/img/asteroid2.png");
 	createSprite("Asteroid2", getTexture("Asteroid2"), 16, 16, 250, 1);
 
+	//Gamma Stuff
+	addTexture("GammaWarning", "assets/img/gamma_warning.png");
+	createSprite("GammaWarning", getTexture("GammaWarning"));
+
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
 	addShader("String", "assets/shaders/string.frag", ShaderType::FRAGMENT);
