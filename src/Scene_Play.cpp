@@ -29,14 +29,14 @@ void Scene_Play::init()
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid2"));
 
 	earth = _entityManager.createEntity("Earth");
-	auto & transfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -100), Vec2(0,0), Vec2(1,1), false);
+	auto & transfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -100), Vec2(0,0), Vec2(1,1), true);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 	_entityManager.addComponent<Component::Health>(earth, 100);
 	_entityManager.addComponent<Component::BoundingBox>(earth, Vec2(256, 256));
 	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
 	//ani->init(earth, _entityManager);
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
-	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, Vec2(0, 185), true);
+	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, &transfrom.direction, Vec2(0, 185), true);
 
 	shield = _entityManager.createEntity("Shield");
 	_entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
@@ -94,7 +94,17 @@ void Scene_Play::tick()
 				}
 			}
 
-			*rope.position = rope.segmentPositions[rope.ropeLength - 1] + rope.positionOffset;
+			if (rope.direction != nullptr) 
+			{
+				*rope.direction = rope.segmentPositions[rope.ropeLength - 2] - rope.segmentPositions[rope.ropeLength - 1];
+				float angle = rope.positionOffset.angle(*rope.direction);
+				Vec2 newOffset(rope.positionOffset.x*cos(angle) - rope.positionOffset.y*sin(angle), rope.positionOffset.x*sin(angle) + rope.positionOffset.y * cos(angle));
+				*rope.position = rope.segmentPositions[rope.ropeLength - 1] - newOffset;
+			}
+			else
+			{
+				*rope.position = rope.segmentPositions[rope.ropeLength - 1] + rope.positionOffset;
+			}
 		}
 
 		handleLifespan(entity);
@@ -221,7 +231,6 @@ void Scene_Play::handleCollisions()
 		{
 			auto& health = _entityManager.getComponent<Component::Health>(earth);
 			health.health -= health.maxHealth;
-			_entityManager.destroyEntity(entity);
 		}
 	}
 }
@@ -389,7 +398,7 @@ void Scene_Play::spawnAsteroid()
 	size_t sprite = rand() % _asteroidSprites.size();
 
 	auto entity = _entityManager.createEntity("Asteroid");
-	auto& transform = _entityManager.addComponent<Component::Transform>(entity, Vec2(pos.x + 10, -100), vel, Vec2(1,1), false);
+	auto& transform = _entityManager.addComponent<Component::Transform>(entity, Vec2(pos.x + 10, -100), vel, Vec2(1,1), true);
 	_entityManager.addComponent<Component::Health>(entity, 1);
 	auto & mat = _entityManager.addComponent<Component::Material>(entity, _asteroidSprites[sprite], true);
 	_entityManager.addComponent<Component::BoundingBox>(entity, (mat.sprite.getSize()*0.6f));
@@ -400,7 +409,7 @@ void Scene_Play::spawnAsteroid()
 
 	size_t ropeSegs = 20;
 	float segDist = (pos.y + _engine->getWindow().getSize().y / 2.0f) / ropeSegs;
-	_entityManager.addComponent<Component::Rope>(entity, ropeSegs, segDist,  Vec2(pos.x, -(float)_engine->getWindow().getSize().y/2.0f), &transform.position, Vec2(0,32), true);
+	_entityManager.addComponent<Component::Rope>(entity, ropeSegs, segDist,  Vec2(pos.x, -(float)_engine->getWindow().getSize().y/2.0f), &transform.position, &transform.direction, Vec2(0,32), true);
 
 }
 

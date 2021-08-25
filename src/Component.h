@@ -119,9 +119,16 @@ namespace Component {
 			this->anchor = &segmentPositions[0];
 		}
 
+		Rope(size_t ropeLength, float segmentDistance, Vec2 anchor, Vec2* position, Vec2* direction, Vec2 positionOffset, bool movementOnAnchor)
+			: Rope(ropeLength, segmentDistance, anchor, position, positionOffset, movementOnAnchor)
+		{
+			this->direction = direction;
+		}
+
 		bool movementOnAnchor;
 		Vec2* anchor;
 		Vec2* position;
+		Vec2* direction = nullptr;
 		Vec2 positionOffset;
 		std::vector<Vec2> segmentPositions;
 		std::vector<Vec2> prevSegmentPositions;
