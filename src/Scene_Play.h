@@ -16,6 +16,7 @@ protected:
 
 	void handleCollisions();
 	void handleMovement(Entity entity);
+	void handleOrbit(Entity entity);
 	void handleAnimations(Entity entity);
 
 public:
