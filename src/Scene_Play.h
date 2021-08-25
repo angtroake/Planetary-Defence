@@ -32,6 +32,6 @@ public:
 
 	void spawnAsteroid();
 	void spawnGammaWarning();
-	void spawnGamma(float angle);
+	void spawnGamma(Vec2 dir);
 };
 

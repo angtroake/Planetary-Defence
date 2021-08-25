@@ -289,7 +289,8 @@ void Scene_Play::handleLifespan(Entity entity)
 
 				auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
 				auto& warningTransform = _entityManager.getComponent<Component::Transform>(entity);
-				spawnGamma(Vec2(-1, 0).angle(earthTransform.position - warningTransform.position));
+				Vec2 dir = earthTransform.position - warningTransform.position;
+				spawnGamma(dir / dir.mag());
 			}
 
 			_entityManager.destroyEntity(entity);
@@ -409,11 +410,11 @@ void Scene_Play::spawnGammaWarning()
 	_entityManager.addComponent<Component::CAnimation>(warning, ani);
 }
 
-void Scene_Play::spawnGamma(float angle) 
+void Scene_Play::spawnGamma(Vec2 dir) 
 {
 	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
 
-	Vec2 gammaPos(4000 * sin(angle), 4000 * cos(angle));
+	Vec2 gammaPos = earthTransform.position - dir*4000;
 	gammaPos = gammaPos + earthTransform.position;
 	Vec2 vel = earthTransform.position - gammaPos;
 	vel = vel / vel.mag() * 50.0f;
