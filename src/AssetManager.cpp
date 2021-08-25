@@ -17,6 +17,7 @@ void AssetManager::init()
 
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
+	addShader("String", "assets/shaders/string.frag", ShaderType::FRAGMENT);
 }
 
 void AssetManager::addFont(const std::string name, const std::string path) 

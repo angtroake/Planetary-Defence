@@ -20,13 +20,14 @@ void Scene_Play::init()
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid2"));
 
 	earth = _entityManager.createEntity("Earth");
-	_entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2, _engine->getWindow().getSize().y / 2), Vec2(0,0), Vec2(1,1), false);
+	auto & transfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -100), Vec2(0,0), Vec2(1,1), false);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 	_entityManager.addComponent<Component::Health>(earth, 100);
 	_entityManager.addComponent<Component::BoundingBox>(earth, Vec2(256, 256));
-	std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
-	ani->init(earth, _entityManager);
-	_entityManager.addComponent<Component::CAnimation>(earth, ani);
+	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
+	//ani->init(earth, _entityManager);
+	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
+	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, Vec2(0, 185), true);
 
 	//Shader Test Fail
 	/*
@@ -72,6 +73,47 @@ void Scene_Play::tick()
 			}
 		}
 
+		//Rope Update
+		if (_entityManager.hasComponent<Component::Rope>(entity)) 
+		{
+			auto& rope = _entityManager.getComponent<Component::Rope>(entity);
+			
+			for (int i = 1; i < rope.ropeLength; i++) 
+			{
+				Vec2 vel = rope.segmentPositions[i] - rope.prevSegmentPositions[i];
+				rope.prevSegmentPositions[i] = rope.segmentPositions[i];
+
+				vel.y += GRAVITY;
+				vel = vel * 0.98f;
+				rope.segmentPositions[i] = rope.segmentPositions[i] + vel;
+
+			}
+
+			for (int j = 0; j < 30; j++) {
+				for (int i = 1; i < rope.ropeLength; i++)
+				{
+					//rope constraints
+					Vec2 dir = rope.segmentPositions[i - 1] - rope.segmentPositions[i];
+					dir = dir / dir.mag();
+
+					float d = rope.segmentPositions[i].dist(rope.segmentPositions[i - 1]);
+					float err = d - rope.segmentDistance;
+
+					if (i == 1) 
+					{
+						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
+					}
+					else 
+					{
+						rope.segmentPositions[i - 1] = rope.segmentPositions[i - 1] - (dir * err * 0.8f);
+						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
+					}
+				}
+			}
+
+			*rope.position = rope.segmentPositions[rope.ropeLength - 1] + rope.positionOffset;
+		}
+
 		handleAnimations(entity);
 		handleMovement(entity);
 	}
@@ -85,7 +127,6 @@ void Scene_Play::tick()
 		timeUntilAsteroid = rand() % 600;
 	}
 
-
 	_currentFrame++;
 	timeAlive++;
 }
@@ -95,10 +136,55 @@ void Scene_Play::render()
 	_engine->getWindow().setView(_engine->getWindow().getDefaultView());
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
-	for (auto entity : _entityManager.getEntities()) 
+	for (auto entity : _entityManager.getEntities())
 	{
 		renderEntity(entity, renderDebug);
 	}
+
+	renderHealth();
+
+	if (!alive)
+	{
+		_engine->changeScene(NULL, "MAIN_MENU", true);
+	}
+}
+
+void Scene_Play::renderHealth()
+{
+	float healthBarLength = _engine->getWindowSize().x / 4.0f;
+
+	//Draw Title
+	sf::Text text;
+	text.setFont(_engine->getAssets().getFont("Crater"));
+	text.setCharacterSize(36);
+	text.setFillColor(sf::Color(255, 255, 255));
+	text.setString("Health");
+	Util::centerText(text);
+	text.setPosition({ _engine->getWindowSize().x - 20.0f - healthBarLength / 2, 20 });
+	_engine->getWindow().draw(text);
+
+	//Health Bar
+	sf::RectangleShape healthRect;
+	healthRect.setSize({ healthBarLength, _engine->getWindowSize().y / 25.0f });
+	healthRect.setOutlineColor(sf::Color(255, 255, 255));
+	healthRect.setFillColor(sf::Color(255, 0, 0));
+	healthRect.setOutlineThickness(5);
+	healthRect.setOrigin(healthBarLength, 0);
+	healthRect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
+	_engine->getWindow().draw(healthRect);
+
+	//Lost Health
+	float lostHealth = _entityManager.getComponent<Component::Health>(earth).maxHealth - _entityManager.getComponent<Component::Health>(earth).health;
+	float maxHealth = _entityManager.getComponent<Component::Health>(earth).maxHealth;
+
+	sf::RectangleShape lostHealthRect;
+	lostHealthRect.setSize({ healthBarLength * (lostHealth / maxHealth), _engine->getWindowSize().y / 25.0f });
+	lostHealthRect.setOutlineColor(sf::Color(0, 0, 0));
+	lostHealthRect.setFillColor(sf::Color(0, 0, 0));
+	lostHealthRect.setOutlineThickness(0);
+	lostHealthRect.setOrigin(healthBarLength, 0);
+	lostHealthRect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
+	_engine->getWindow().draw(lostHealthRect);
 }
 
 void Scene_Play::handleCollisions()
@@ -113,6 +199,11 @@ void Scene_Play::handleCollisions()
 		{
 			_entityManager.destroyEntity(entity);
 			_entityManager.getComponent<Component::Health>(earth).damage(1);
+
+			if (_entityManager.getComponent<Component::Health>(earth).health <= 0)
+			{
+				alive = false;
+			}
 		}
 	}
 }
@@ -122,9 +213,17 @@ void Scene_Play::handleMovement(Entity entity)
 	if (_entityManager.hasComponent<Component::Transform>(entity))
 	{
 		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+		if (_entityManager.hasComponent<Component::Rope>(entity) && _entityManager.getComponent<Component::Rope>(entity).movementOnAnchor) 
+		{
+			auto& rope = _entityManager.getComponent<Component::Rope>(entity);
+			*rope.anchor = *rope.anchor + transform.velocity;
+		}
+		else 
+		{
+			transform.prevPosition = transform.position;
+			transform.position = transform.position + transform.velocity;
+		}
 
-		transform.prevPosition = transform.position;
-		transform.position = transform.position + transform.velocity;
 	}
 }
 
@@ -173,20 +272,25 @@ void Scene_Play::spawnAsteroid()
 {
 	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
 
-	float angle = (float)(rand() % 360) * PI / 180.0f;
-	Vec2 pos(500 * sin(angle), 500 * cos(angle));
+	float angle = 60.0f + (float)(rand() % 360) * PI / 180.0f;
+	Vec2 pos(700 * sin(angle), 700 * cos(angle));
 	pos = earthTransform.position + pos;
 	Vec2 vel = (earthTransform.position - pos) / pos.dist(earthTransform.position) * 0.5;
 
 	size_t sprite = rand() % _asteroidSprites.size();
 
 	auto entity = _entityManager.createEntity("Asteroid");
-	_entityManager.addComponent<Component::Transform>(entity, pos, vel, Vec2(1,1), false);
+	auto& transform = _entityManager.addComponent<Component::Transform>(entity, Vec2(pos.x + 10, -100), vel, Vec2(1,1), false);
 	_entityManager.addComponent<Component::Health>(entity, 1);
 	auto & mat = _entityManager.addComponent<Component::Material>(entity, _asteroidSprites[sprite], true);
 	_entityManager.addComponent<Component::BoundingBox>(entity, (mat.sprite.getSize()*0.6f));
-	std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, pos.y, vel);
+	
+	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 120);
 	ani->init(entity, _entityManager);
 	_entityManager.addComponent<Component::CAnimation>(entity, ani);
+
+	size_t ropeSegs = 20;
+	float segDist = (pos.y + _engine->getWindow().getSize().y / 2.0f) / ropeSegs;
+	_entityManager.addComponent<Component::Rope>(entity, ropeSegs, segDist,  Vec2(pos.x, -(float)_engine->getWindow().getSize().y/2.0f), &transform.position, Vec2(0,32), true);
 
 }

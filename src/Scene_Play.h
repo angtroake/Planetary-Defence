@@ -12,6 +12,7 @@ protected:
 	std::vector<Sprite> _asteroidSprites;
 
 	bool renderDebug = false;
+	bool alive = true;
 
 	void handleCollisions();
 	void handleMovement(Entity entity);
@@ -21,6 +22,7 @@ public:
 	Scene_Play(GameEngine* engine);
 	void tick();
 	void render();
+	void renderHealth();
 	void init();
 	void onKeyAction(std::string actionName, KeyAction action);
 
