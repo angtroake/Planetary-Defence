@@ -9,6 +9,7 @@ protected:
 	size_t timeAlive = 0;
 
 	size_t timeUntilAsteroid = 120;
+	size_t timeUntilGamma = 300;
 
 	std::vector<Sprite> _asteroidSprites;
 
@@ -29,5 +30,6 @@ public:
 	void onKeyAction(std::string actionName, KeyAction action);
 
 	void spawnAsteroid();
+	void spawnGamma();
 };
 

@@ -105,10 +105,17 @@ void Scene_Play::tick()
 	handleCollisions();
 
 	timeUntilAsteroid--;
-	if (timeUntilAsteroid == 0) 
+	if (timeUntilAsteroid <= 0) 
 	{
 		spawnAsteroid();
 		timeUntilAsteroid = rand() % 600;
+	}
+
+	timeUntilGamma--;
+	if (timeUntilGamma <= 0) 
+	{
+		spawnGamma();
+		timeUntilGamma = 20 + rand() % (60 * 30);
 	}
 
 	_currentFrame++;
@@ -290,6 +297,12 @@ void Scene_Play::handleAnimations(Entity entity)
 			_entityManager.removeComponent<Component::CAnimation>(entity);
 		}
 	}
+
+	//Gamma Warning Removal
+	if (_entityManager.getTag(entity) == "GammaWarning" && !_entityManager.hasComponent<Component::CAnimation>(entity)) 
+	{
+		_entityManager.destroyEntity(entity);
+	}
 }
 
 
@@ -358,4 +371,19 @@ void Scene_Play::spawnAsteroid()
 	float segDist = (pos.y + _engine->getWindow().getSize().y / 2.0f) / ropeSegs;
 	_entityManager.addComponent<Component::Rope>(entity, ropeSegs, segDist,  Vec2(pos.x, -(float)_engine->getWindow().getSize().y/2.0f), &transform.position, Vec2(0,32), true);
 
+}
+
+void Scene_Play::spawnGamma()
+{
+	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+
+	float angle = (float)(rand() % 360) * PI / 180.0f;
+	Vec2 warningPos(500 * sin(angle), 500 * cos(angle));
+	warningPos = warningPos + earthTransform.position;
+
+	auto warning = _entityManager.createEntity("GammaWarning");
+	_entityManager.addComponent<Component::Transform>(warning, warningPos, Vec2(0,0), Vec2(0.5,0.5), false);
+	_entityManager.addComponent<Component::Material>(warning, _engine->getAssets().getSprite("GammaWarning"), true);
+	std::shared_ptr<AnimationBlink> ani = std::make_shared<AnimationBlink>(_engine, 60, 5 * 60);
+	_entityManager.addComponent<Component::CAnimation>(warning, ani);
 }
