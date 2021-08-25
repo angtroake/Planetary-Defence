@@ -4,6 +4,7 @@ class Scene_Play : public Scene
 {
 protected:
 	Entity earth;
+	Entity shield;
 	size_t difficulty = 0;
 	size_t timeAlive = 0;
 

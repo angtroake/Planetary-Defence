@@ -38,10 +38,11 @@ void Scene_Play::init()
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
 	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, Vec2(0, 185), true);
 
-	auto shield = _entityManager.createEntity("Shield");
+	shield = _entityManager.createEntity("Shield");
 	_entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
 	_entityManager.addComponent<Component::Orbit>(shield, earth, 300, 0.01, true);
 	_entityManager.addComponent<Component::Input>(shield);
+	_entityManager.addComponent<Component::BoundingBox>(shield, Vec2(50, 50));
 }
 
 void Scene_Play::tick()
@@ -197,6 +198,12 @@ void Scene_Play::handleCollisions()
 			{
 				alive = false;
 			}
+		}
+
+		overlap = Physics::getOverlap(_entityManager, entity, shield);
+		if (overlap.x > 0 && overlap.y > 0)
+		{
+			_entityManager.destroyEntity(entity);
 		}
 	}
 }
