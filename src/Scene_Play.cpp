@@ -22,7 +22,7 @@ void Scene_Play::init()
 	earth = _entityManager.createEntity("Earth");
 	auto & transfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -100), Vec2(0,0), Vec2(1,1), false);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
-	_entityManager.addComponent<Component::Health>(earth, 100);
+	_entityManager.addComponent<Component::Health>(earth, 1);
 	_entityManager.addComponent<Component::BoundingBox>(earth, Vec2(256, 256));
 	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
 	//ani->init(earth, _entityManager);
@@ -135,7 +135,6 @@ void Scene_Play::tick()
 		timeUntilAsteroid = rand() % 600;
 	}
 
-
 	_currentFrame++;
 	timeAlive++;
 }
@@ -151,6 +150,11 @@ void Scene_Play::render()
 	}
 
 	renderHealth();
+
+	if (!alive)
+	{
+		_engine->changeScene(NULL, "MAIN_MENU", true);
+	}
 }
 
 void Scene_Play::renderHealth()
@@ -178,7 +182,6 @@ void Scene_Play::renderHealth()
 	_engine->getWindow().draw(healthRect);
 
 	//Lost Health
-	Entity earth = _entityManager.getEntities("Earth")[0];
 	float lostHealth = _entityManager.getComponent<Component::Health>(earth).maxHealth - _entityManager.getComponent<Component::Health>(earth).health;
 	float maxHealth = _entityManager.getComponent<Component::Health>(earth).maxHealth;
 
@@ -204,6 +207,11 @@ void Scene_Play::handleCollisions()
 		{
 			_entityManager.destroyEntity(entity);
 			_entityManager.getComponent<Component::Health>(earth).damage(1);
+
+			if (_entityManager.getComponent<Component::Health>(earth).health == 0)
+			{
+				alive = false;
+			}
 		}
 	}
 }

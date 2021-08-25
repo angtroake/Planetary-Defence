@@ -12,6 +12,7 @@ protected:
 	std::vector<Sprite> _asteroidSprites;
 
 	bool renderDebug = false;
+	bool alive = true;
 
 	void handleCollisions();
 	void handleMovement(Entity entity);
