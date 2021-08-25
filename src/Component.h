@@ -87,8 +87,10 @@ namespace Component {
 	{
 	public:
 		Rope() {}
-		Rope(size_t ropeLength, float segmentDistance, Vec2 anchor, Vec2* position, Vec2 positionOffset) : ropeLength(ropeLength), segmentDistance(segmentDistance), anchor(anchor), position(position), positionOffset(positionOffset)
+		Rope(size_t ropeLength, float segmentDistance, Vec2 anchor, Vec2* position, Vec2 positionOffset, bool movementOnAnchor) 
+			: ropeLength(ropeLength), segmentDistance(segmentDistance), position(position), positionOffset(positionOffset), movementOnAnchor(movementOnAnchor)
 		{
+			assert(ropeLength >= 2);
 			Vec2 dir = (*position - anchor)/segmentDistance;
 			for (size_t i = 0; i < ropeLength; i++) 
 			{
@@ -97,9 +99,12 @@ namespace Component {
 			}
 			segmentPositions[ropeLength - 1] = *position;
 			prevSegmentPositions[ropeLength - 1] = *position;
+
+			this->anchor = &segmentPositions[0];
 		}
 
-		Vec2 anchor;
+		bool movementOnAnchor;
+		Vec2* anchor;
 		Vec2* position;
 		Vec2 positionOffset;
 		std::vector<Vec2> segmentPositions;

@@ -36,4 +36,15 @@ public:
 	AnimationDrop(GameEngine* gameEngine, float targetY, Vec2 resetVelocity) : targetY(targetY), resetVelocity(resetVelocity){ _engine = gameEngine; }
 };
 
+class Cooldown : public Animation
+{
+protected:
+	void animate(const Entity& entity, EntityManager& entityManager) override;
+	void setup(const Entity& entity, EntityManager& entityManager) override;
+
+	size_t frames;
+
+public:
+	Cooldown(GameEngine* gameEngine, size_t frames): frames(frames) { _engine = gameEngine; }
+};
 

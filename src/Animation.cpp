@@ -66,3 +66,17 @@ void AnimationDrop::animate(const Entity& entity, EntityManager& entityManager)
 		}
 	}
 }
+
+void Cooldown::animate(const Entity& entity, EntityManager& entityManager)
+{
+	frames--;
+	if (frames <= 0)
+	{
+		finish();
+	}
+}
+
+void Cooldown::setup(const Entity& entity, EntityManager& entityManager)
+{
+
+}

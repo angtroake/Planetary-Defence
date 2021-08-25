@@ -48,7 +48,7 @@ void Scene::renderEntity(const int & entity, bool debug)
 	if (debug && _entityManager.hasComponent<Component::BoundingBox>(entity)) 
 	{
 		auto& boundingbox = _entityManager.getComponent<Component::BoundingBox>(entity);
-		auto& transfrom = _entityManager.getComponent<Component::Transform>(entity);
+		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
 
 		sf::RectangleShape rect;
 		rect.setSize({ boundingbox.size.x, boundingbox.size.y });
@@ -56,7 +56,7 @@ void Scene::renderEntity(const int & entity, bool debug)
 		rect.setFillColor(sf::Color(0, 0, 0, 0));
 		rect.setOutlineThickness(2);
 		rect.setOrigin(boundingbox.halfSize.x, boundingbox.halfSize.y);
-		rect.setPosition({ transfrom.position.x, transfrom.position.y });
+		rect.setPosition({ transform.position.x, transform.position.y });
 		_engine->getWindow().draw(rect);
 	}
 
@@ -90,5 +90,17 @@ void Scene::renderEntity(const int & entity, bool debug)
 				_engine->getWindow().draw(circle);
 			}
 		}
+	}
+
+	if (debug && _entityManager.hasComponent<Component::CAnimation>(entity)) 
+	{
+		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+
+		sf::RectangleShape rect;
+		rect.setSize({ 10, 10 });
+		rect.setFillColor(sf::Color(0, 255, 255));
+		rect.setOrigin(2.5, 2.5);
+		rect.setPosition({ transform.position.x, transform.position.y });
+		_engine->getWindow().draw(rect);
 	}
 }
