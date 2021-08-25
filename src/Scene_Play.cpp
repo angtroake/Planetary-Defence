@@ -15,6 +15,15 @@ void Scene_Play::init()
 {
 	registerKeyAction(sf::Keyboard::Escape, "EXIT");
 	registerKeyAction(sf::Keyboard::BackSlash, "DEBUG");
+	registerKeyAction(sf::Keyboard::Down, "DOWN");
+	registerKeyAction(sf::Keyboard::Up, "UP");
+	registerKeyAction(sf::Keyboard::Left, "LEFT");
+	registerKeyAction(sf::Keyboard::Right, "RIGHT");
+	registerKeyAction(sf::Keyboard::S, "DOWN");
+	registerKeyAction(sf::Keyboard::W, "UP");
+	registerKeyAction(sf::Keyboard::A, "LEFT");
+	registerKeyAction(sf::Keyboard::D, "RIGHT");
+	registerKeyAction(sf::Keyboard::Space, "SHOOT");
 
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid1"));
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid2"));
@@ -29,12 +38,9 @@ void Scene_Play::init()
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
 	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, Vec2(0, 185), true);
 
-	//Shader Test Fail
-	/*
 	auto test = _entityManager.createEntity("Test");
 	_entityManager.addComponent<Component::Transform>(test, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
 	_entityManager.addComponent<Component::Orbit>(test, earth, 300, 0.01, true);
-	*/
 }
 
 void Scene_Play::tick()
@@ -48,31 +54,6 @@ void Scene_Play::tick()
 	//Entity Logic
 	for (auto entity : _entityManager.getEntities())
 	{
-
-		//Orbit Update
-		if (_entityManager.hasComponent<Component::Orbit>(entity)) 
-		{
-			auto& orbit = _entityManager.getComponent<Component::Orbit>(entity);
-			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
-
-			if (_entityManager.isAlive(orbit.target)) 
-			{
-				auto& target_transform = _entityManager.getComponent<Component::Transform>(orbit.target);
-
-				if (orbit.clockWise) { orbit.currentAngle = orbit.currentAngle + orbit.speed; }
-				else { orbit.currentAngle = orbit.currentAngle - orbit.speed; }
-				
-				if (orbit.currentAngle > 2.0f * PI) { orbit.currentAngle -= 2.0f * PI; }
-				else if (orbit.currentAngle < 0) { orbit.currentAngle += 2.0f * PI; }
-
-				Vec2 vec(orbit.distance * sin(orbit.currentAngle), orbit.distance * cos(orbit.currentAngle));
-				vec = target_transform.position + vec;
-
-				transform.prevVelocity = transform.velocity;
-				transform.velocity = vec - transform.position;
-			}
-		}
-
 		//Rope Update
 		if (_entityManager.hasComponent<Component::Rope>(entity)) 
 		{
@@ -116,6 +97,7 @@ void Scene_Play::tick()
 
 		handleAnimations(entity);
 		handleMovement(entity);
+		handleOrbit(entity);
 	}
 
 	handleCollisions();
@@ -146,6 +128,16 @@ void Scene_Play::render()
 	for (auto entity : _entityManager.getEntities())
 	{
 		renderEntity(entity, renderDebug);
+
+		if (_entityManager.getTag(entity) == "Test")
+		{
+			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+			sf::RectangleShape rect;
+			rect.setPosition({ transform.position.x - 25, transform.position.y - 25 });
+			rect.setFillColor(sf::Color(255, 255, 255));
+			rect.setSize({ 50,50 });
+			_engine->getWindow().draw(rect);
+		}
 	}
 
 	renderHealth();
@@ -234,6 +226,32 @@ void Scene_Play::handleMovement(Entity entity)
 	}
 }
 
+void Scene_Play::handleOrbit(Entity entity)
+{
+	if (_entityManager.hasComponent<Component::Orbit>(entity))
+	{
+		auto& orbit = _entityManager.getComponent<Component::Orbit>(entity);
+		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+
+		if (_entityManager.isAlive(orbit.target))
+		{
+			auto& target_transform = _entityManager.getComponent<Component::Transform>(orbit.target);
+
+			if (orbit.clockWise) { orbit.currentAngle = orbit.currentAngle + orbit.moving ? orbit.speed : 0; }
+			else { orbit.currentAngle = orbit.currentAngle - orbit.moving ? orbit.speed : 0; }
+
+			if (orbit.currentAngle > 2.0f * PI) { orbit.currentAngle -= 2.0f * PI; }
+			else if (orbit.currentAngle < 0) { orbit.currentAngle += 2.0f * PI; }
+
+			Vec2 vec(orbit.distance * sin(orbit.currentAngle), orbit.distance * cos(orbit.currentAngle));
+			vec = target_transform.position + vec;
+
+			transform.prevVelocity = transform.velocity;
+			transform.velocity = vec - transform.position;
+		}
+	}
+}
+
 void Scene_Play::handleAnimations(Entity entity)
 {
 	//Sprite animations
@@ -278,6 +296,13 @@ void Scene_Play::onKeyAction(std::string actionName, KeyAction action)
 	if (actionName == "DEBUG" && action.type == ActionType::KEY_PRESS) 
 	{
 		renderDebug = !renderDebug;
+	}
+	if (actionName == "LEFT" && action.type == ActionType::KEY_PRESS)
+	{
+		for (auto entity : _entityManager.getEntities("Test"))
+		{
+			entity;
+		}
 	}
 }
 

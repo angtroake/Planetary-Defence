@@ -61,7 +61,23 @@ namespace Component {
 		float distance;
 		float speed;
 		bool clockWise;
+		bool moving = false;
 		float currentAngle = 0;
+	};
+
+	class Input : public Component
+	{
+	public:
+		bool cw = false;
+		bool ccw = false;
+		bool up = false;
+		bool down = false;
+		bool left = false;
+		bool right = false;
+		bool shoot = false;
+		bool canShoot = true;
+
+		Input() {}
 	};
 
 	class CAnimation : public Component
