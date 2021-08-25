@@ -17,6 +17,7 @@ typedef std::tuple<
 	Component::Material[MAX_ENTITIES],
 	Component::Health[MAX_ENTITIES],
 	Component::Orbit[MAX_ENTITIES],
+	Component::Input[MAX_ENTITIES],
 	Component::CAnimation[MAX_ENTITIES],
 	Component::BoundingBox[MAX_ENTITIES],
 	Component::Rope[MAX_ENTITIES]

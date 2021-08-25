@@ -38,9 +38,10 @@ void Scene_Play::init()
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
 	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, Vec2(0, 185), true);
 
-	auto test = _entityManager.createEntity("Test");
-	_entityManager.addComponent<Component::Transform>(test, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
-	_entityManager.addComponent<Component::Orbit>(test, earth, 300, 0.01, true);
+	auto shield = _entityManager.createEntity("Shield");
+	_entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
+	_entityManager.addComponent<Component::Orbit>(shield, earth, 300, 0.01, true);
+	_entityManager.addComponent<Component::Input>(shield);
 }
 
 void Scene_Play::tick()
@@ -95,9 +96,9 @@ void Scene_Play::tick()
 			*rope.position = rope.segmentPositions[rope.ropeLength - 1] + rope.positionOffset;
 		}
 
+		handleOrbit(entity);
 		handleAnimations(entity);
 		handleMovement(entity);
-		handleOrbit(entity);
 	}
 
 	handleCollisions();
@@ -122,7 +123,7 @@ void Scene_Play::render()
 	{
 		renderEntity(entity, renderDebug);
 
-		if (_entityManager.getTag(entity) == "Test")
+		if (_entityManager.getTag(entity) == "Shield")
 		{
 			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
 			sf::RectangleShape rect;
@@ -225,13 +226,24 @@ void Scene_Play::handleOrbit(Entity entity)
 	{
 		auto& orbit = _entityManager.getComponent<Component::Orbit>(entity);
 		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+		auto& input = _entityManager.getComponent<Component::Input>(entity);
+
+		if (input.ccw != input.cw)
+		{
+			orbit.clockWise = input.cw;
+			orbit.moving = true;
+		}
+		else
+		{
+			orbit.moving = false;
+		}
 
 		if (_entityManager.isAlive(orbit.target))
 		{
 			auto& target_transform = _entityManager.getComponent<Component::Transform>(orbit.target);
 
-			if (orbit.clockWise) { orbit.currentAngle = orbit.currentAngle + orbit.moving ? orbit.speed : 0; }
-			else { orbit.currentAngle = orbit.currentAngle - orbit.moving ? orbit.speed : 0; }
+			if (orbit.clockWise) { orbit.currentAngle = orbit.currentAngle + (orbit.moving ? orbit.speed : 0); }
+			else { orbit.currentAngle = orbit.currentAngle - (orbit.moving ? orbit.speed : 0); }
 
 			if (orbit.currentAngle > 2.0f * PI) { orbit.currentAngle -= 2.0f * PI; }
 			else if (orbit.currentAngle < 0) { orbit.currentAngle += 2.0f * PI; }
@@ -284,11 +296,32 @@ void Scene_Play::onKeyAction(std::string actionName, KeyAction action)
 	{
 		renderDebug = !renderDebug;
 	}
-	if (actionName == "LEFT" && action.type == ActionType::KEY_PRESS)
+	if (actionName == "LEFT")
 	{
-		for (auto entity : _entityManager.getEntities("Test"))
+		for (auto entity : _entityManager.getEntities("Shield"))
 		{
-			entity;
+			if (action.type == ActionType::KEY_PRESS)
+			{
+				_entityManager.getComponent<Component::Input>(entity).cw = true;
+			}
+			else if (action.type == ActionType::KEY_RELEASE)
+			{
+				_entityManager.getComponent<Component::Input>(entity).cw = false;
+			}
+		}
+	}
+	if (actionName == "RIGHT")
+	{
+		for (auto entity : _entityManager.getEntities("Shield"))
+		{
+			if (action.type == ActionType::KEY_PRESS)
+			{
+				_entityManager.getComponent<Component::Input>(entity).ccw = true;
+			}
+			else if (action.type == ActionType::KEY_RELEASE)
+			{
+				_entityManager.getComponent<Component::Input>(entity).ccw = false;
+			}
 		}
 	}
 }
