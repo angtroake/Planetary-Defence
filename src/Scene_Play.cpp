@@ -173,9 +173,23 @@ void Scene_Play::renderHealth()
 	healthRect.setOutlineColor(sf::Color(255, 255, 255));
 	healthRect.setFillColor(sf::Color(255, 0, 0));
 	healthRect.setOutlineThickness(5);
-	healthRect.setOrigin(_engine->getWindowSize().x / 4.0f, 0);
+	healthRect.setOrigin(healthBarLength, 0);
 	healthRect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
 	_engine->getWindow().draw(healthRect);
+
+	//Lost Health
+	Entity earth = _entityManager.getEntities("Earth")[0];
+	float lostHealth = _entityManager.getComponent<Component::Health>(earth).maxHealth - _entityManager.getComponent<Component::Health>(earth).health;
+	float maxHealth = _entityManager.getComponent<Component::Health>(earth).maxHealth;
+
+	sf::RectangleShape lostHealthRect;
+	lostHealthRect.setSize({ healthBarLength * (lostHealth / maxHealth), _engine->getWindowSize().y / 25.0f });
+	lostHealthRect.setOutlineColor(sf::Color(0, 0, 0));
+	lostHealthRect.setFillColor(sf::Color(0, 0, 0));
+	lostHealthRect.setOutlineThickness(0);
+	lostHealthRect.setOrigin(healthBarLength, 0);
+	lostHealthRect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
+	_engine->getWindow().draw(lostHealthRect);
 }
 
 void Scene_Play::handleCollisions()
