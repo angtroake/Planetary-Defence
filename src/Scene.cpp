@@ -63,6 +63,10 @@ void Scene::renderEntity(const int & entity, bool debug)
 		rect.setOutlineThickness(2);
 		rect.setOrigin(boundingbox.halfSize.x, boundingbox.halfSize.y);
 		rect.setPosition({ transform.position.x, transform.position.y });
+		if (transform.rotates) 
+		{
+			rect.setRotation(Vec2(0, -1).angle(transform.direction) * 180.f / PI);
+		}
 		_engine->getWindow().draw(rect);
 	}
 

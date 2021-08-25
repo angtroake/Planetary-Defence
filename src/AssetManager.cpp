@@ -6,7 +6,7 @@ void AssetManager::init()
 {
 	addFont("Crater", "assets/fonts/Crater.otf");
 
-	addTexture("Earth", "assets/img/earth2_512.png");
+	addTexture("Earth", "assets/img/earth3_512.png");
 	createSprite("Earth", getTexture("Earth"), 20, 20, 400, 3);
 
 	//Asteroids

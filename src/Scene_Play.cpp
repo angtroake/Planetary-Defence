@@ -214,6 +214,16 @@ void Scene_Play::handleCollisions()
 			_entityManager.destroyEntity(entity);
 		}
 	}
+
+	for (Entity entity : _entityManager.getEntities("GammaRay")) 
+	{
+		if (Physics::isColliding(_entityManager, entity, earth))
+		{
+			auto& health = _entityManager.getComponent<Component::Health>(earth);
+			health.health -= health.maxHealth;
+			_entityManager.destroyEntity(entity);
+		}
+	}
 }
 
 void Scene_Play::handleMovement(Entity entity)
@@ -417,11 +427,17 @@ void Scene_Play::spawnGamma(Vec2 dir)
 	Vec2 gammaPos = earthTransform.position - dir*4000;
 	gammaPos = gammaPos + earthTransform.position;
 	Vec2 vel = earthTransform.position - gammaPos;
-	vel = vel / vel.mag() * 50.0f;
+	vel = vel / vel.mag() * 20.0f;
+
 
 	auto gamma = _entityManager.createEntity("GammaRay");
 	_entityManager.addComponent<Component::Transform>(gamma, gammaPos, vel, Vec2(4, 6), true);
-	_entityManager.addComponent<Component::Material>(gamma, _engine->getAssets().getSprite("GammaRay"), true);
+	auto& mat = _entityManager.addComponent<Component::Material>(gamma, _engine->getAssets().getSprite("GammaRay"), true);
 	_entityManager.addComponent<Component::Lifespan>(gamma, 3 * 60);
+	
+	Vec2 bbSize = mat.sprite.getSize();
+	bbSize.x *= 4;
+	bbSize.y *= 6;
+	_entityManager.addComponent<Component::BoundingBox>(gamma, bbSize );
 	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 60 * 5);
 }
