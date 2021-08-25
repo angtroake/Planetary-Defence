@@ -127,7 +127,6 @@ void Scene_Play::tick()
 		timeUntilAsteroid = rand() % 600;
 	}
 
-
 	_currentFrame++;
 	timeAlive++;
 }
@@ -137,10 +136,55 @@ void Scene_Play::render()
 	_engine->getWindow().setView(_engine->getWindow().getDefaultView());
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
-	for (auto entity : _entityManager.getEntities()) 
+	for (auto entity : _entityManager.getEntities())
 	{
 		renderEntity(entity, renderDebug);
 	}
+
+	renderHealth();
+
+	if (!alive)
+	{
+		_engine->changeScene(NULL, "MAIN_MENU", true);
+	}
+}
+
+void Scene_Play::renderHealth()
+{
+	float healthBarLength = _engine->getWindowSize().x / 4.0f;
+
+	//Draw Title
+	sf::Text text;
+	text.setFont(_engine->getAssets().getFont("Crater"));
+	text.setCharacterSize(36);
+	text.setFillColor(sf::Color(255, 255, 255));
+	text.setString("Health");
+	Util::centerText(text);
+	text.setPosition({ _engine->getWindowSize().x - 20.0f - healthBarLength / 2, 20 });
+	_engine->getWindow().draw(text);
+
+	//Health Bar
+	sf::RectangleShape healthRect;
+	healthRect.setSize({ healthBarLength, _engine->getWindowSize().y / 25.0f });
+	healthRect.setOutlineColor(sf::Color(255, 255, 255));
+	healthRect.setFillColor(sf::Color(255, 0, 0));
+	healthRect.setOutlineThickness(5);
+	healthRect.setOrigin(healthBarLength, 0);
+	healthRect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
+	_engine->getWindow().draw(healthRect);
+
+	//Lost Health
+	float lostHealth = _entityManager.getComponent<Component::Health>(earth).maxHealth - _entityManager.getComponent<Component::Health>(earth).health;
+	float maxHealth = _entityManager.getComponent<Component::Health>(earth).maxHealth;
+
+	sf::RectangleShape lostHealthRect;
+	lostHealthRect.setSize({ healthBarLength * (lostHealth / maxHealth), _engine->getWindowSize().y / 25.0f });
+	lostHealthRect.setOutlineColor(sf::Color(0, 0, 0));
+	lostHealthRect.setFillColor(sf::Color(0, 0, 0));
+	lostHealthRect.setOutlineThickness(0);
+	lostHealthRect.setOrigin(healthBarLength, 0);
+	lostHealthRect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
+	_engine->getWindow().draw(lostHealthRect);
 }
 
 void Scene_Play::handleCollisions()
@@ -155,6 +199,11 @@ void Scene_Play::handleCollisions()
 		{
 			_entityManager.destroyEntity(entity);
 			_entityManager.getComponent<Component::Health>(earth).damage(1);
+
+			if (_entityManager.getComponent<Component::Health>(earth).health <= 0)
+			{
+				alive = false;
+			}
 		}
 	}
 }
