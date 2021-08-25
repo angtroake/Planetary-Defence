@@ -113,4 +113,64 @@ void Scene::renderEntity(const int & entity, bool debug)
 		rect.setPosition({ transform.position.x, transform.position.y });
 		_engine->getWindow().draw(rect);
 	}
+
+	if (_entityManager.hasComponent<Component::PopsicleStick>(entity)) 
+	{
+		auto& stick = _entityManager.getComponent<Component::PopsicleStick>(entity);
+
+		Vec2 diff = *stick.attachment - *stick.anchor;
+		Vec2 dir = diff / diff.mag();
+
+		Sprite mid = _engine->getAssets().getSprite("PopStickMid");
+		mid.get().setOrigin(mid.getSize().x / 2, mid.getSize().y / 2);
+		mid.get().setRotation(Vec2(0, -1).angle(diff) * 180.0f / PI);
+
+		Sprite end = _engine->getAssets().getSprite("PopStickEnd");
+		end.get().setOrigin(end.getSize().x / 2.0f, end.getSize().y / 2.0f);
+		end.get().setRotation(Vec2(0, -1).angle(diff) * 180.0f / PI);
+
+		float midCount = (diff.mag() - end.getSize().y) / mid.getSize().x;
+		int midCountInt = midCount;
+		if (midCount - (float)midCountInt > 0.5f) { midCount++; }
+		float midScale = 1.0f + (midCount - (float)midCountInt) / ((float)midCountInt - 1);
+
+		Vec2 startPos = *stick.anchor + (dir * end.getSize().y / 2.0f) + (dir * (mid.getSize().y * midScale / 2.0f));
+		for (int i = 0; i < midCountInt; i++) 
+		{
+			if (i % 2 == 0) { mid.get().setScale(1, midScale); }
+			else { mid.get().setScale(1, -midScale); }
+
+			Vec2 pos = startPos + dir * (mid.getSize().y*midScale) * i;
+			mid.get().setPosition({pos.x, pos.y});
+			_engine->getWindow().draw(mid.get());
+
+			if (debug) {
+				sf::RectangleShape rect;
+				rect.setSize({ mid.getSize().x, mid.getSize().y * midScale });
+				rect.setOrigin(mid.getSize().x / 2, mid.getSize().y / 2);
+				rect.setRotation(Vec2(0, -1).angle(diff) * 180.0f / PI);
+				rect.setOutlineColor(sf::Color(255, 0, 0));
+				rect.setOutlineThickness(2);
+				rect.setFillColor(sf::Color(0, 0, 0, 0));
+				rect.setPosition({ pos.x, pos.y });
+				_engine->getWindow().draw(rect);
+			}
+		}
+
+		end.get().setPosition({(*stick.attachment + dir).x, (*stick.attachment + dir).y });
+		_engine->getWindow().draw(end.get());
+		end.get().setScale(1, -1);
+		end.get().setPosition({ (*stick.anchor + dir).x, (*stick.anchor + dir).y });
+		_engine->getWindow().draw(end.get());
+
+		/*
+		sf::RectangleShape rect;
+		rect.setSize({ 10, diff.mag() });
+		rect.setOrigin(5, diff.mag() / 2.0f);
+		rect.setRotation(Vec2(0,-1).angle(diff) * 180.0f / PI);
+		rect.setFillColor(sf::Color(255, 0, 0));
+		rect.setPosition({ pos.x, pos.y });
+		_engine->getWindow().draw(rect);
+		*/
+	}
 }

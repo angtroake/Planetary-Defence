@@ -12,7 +12,7 @@ const Entity MAX_ENTITIES = 1000;
 
 //Tuple containing all possible components
 //Components must be added to this tuple to be usable with entities.
-typedef std::tuple<
+typedef std::tuple <
 	Component::Transform[MAX_ENTITIES],
 	Component::Material[MAX_ENTITIES],
 	Component::Health[MAX_ENTITIES],
@@ -21,7 +21,8 @@ typedef std::tuple<
 	Component::CAnimation[MAX_ENTITIES],
 	Component::BoundingBox[MAX_ENTITIES],
 	Component::Rope[MAX_ENTITIES],
-	Component::Lifespan[MAX_ENTITIES]
+	Component::Lifespan[MAX_ENTITIES],
+	Component::PopsicleStick[MAX_ENTITIES]
 > ComponentArrays;
 
 

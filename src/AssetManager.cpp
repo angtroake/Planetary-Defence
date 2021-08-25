@@ -25,6 +25,12 @@ void AssetManager::init()
 	addTexture("Shield", "assets/img/shield.png");
 	createSprite("Shield", getTexture("Shield"), 1, 8, 8, 3);
 
+	//Popsicle Stick
+	addTexture("PopStickMid", "assets/img/popstick_mid.png");
+	createSprite("PopStickMid", getTexture("PopStickMid"));
+	addTexture("PopStickEnd", "assets/img/popstick_end.png");
+	createSprite("PopStickEnd", getTexture("PopStickEnd"));
+
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
 	addShader("String", "assets/shaders/string.frag", ShaderType::FRAGMENT);

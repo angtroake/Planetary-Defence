@@ -144,6 +144,20 @@ namespace Component {
 
 		size_t frames;
 	};
+
+	class PopsicleStick : public Component 
+	{
+	public:
+		PopsicleStick() {};
+		PopsicleStick(Vec2 anchor, Vec2* position, bool movementOnAnchor): _anchor(anchor), anchor(&_anchor), attachment(position), movementOnAnchor(movementOnAnchor){};
+		PopsicleStick(Vec2* anchor, Vec2* position, bool movementOnAnchor) : anchor(anchor), attachment(position), movementOnAnchor(movementOnAnchor) {};
+
+		Vec2* anchor;
+		Vec2* attachment;
+		bool movementOnAnchor;
+	protected:
+		Vec2 _anchor;
+	};
 }
 
 

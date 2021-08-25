@@ -29,21 +29,22 @@ void Scene_Play::init()
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid2"));
 
 	earth = _entityManager.createEntity("Earth");
-	auto & transfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -100), Vec2(0,0), Vec2(1,1), true);
+	auto & earthTransfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -100), Vec2(0,0), Vec2(1,1), true);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 	_entityManager.addComponent<Component::Health>(earth, 100);
 	_entityManager.addComponent<Component::BoundingBox>(earth, Vec2(256, 256));
 	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
 	//ani->init(earth, _entityManager);
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
-	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &transfrom.position, &transfrom.direction, Vec2(0, 185), true);
+	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &earthTransfrom.position, &earthTransfrom.direction, Vec2(0, 185), true);
 
 	shield = _entityManager.createEntity("Shield");
-	_entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
+	auto & shieldTransform = _entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
 	_entityManager.addComponent<Component::Material>(shield, _engine->getAssets().getSprite("Shield"), true);
 	_entityManager.addComponent<Component::Orbit>(shield, earth, 300, 0.01, true);
 	_entityManager.addComponent<Component::Input>(shield);
 	_entityManager.addComponent<Component::BoundingBox>(shield, Vec2(250, 50));
+	_entityManager.addComponent<Component::PopsicleStick>(shield, &earthTransfrom.position, &shieldTransform.position, false);
 }
 
 void Scene_Play::tick()
