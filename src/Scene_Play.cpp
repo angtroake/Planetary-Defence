@@ -2,6 +2,7 @@
 #include "engine.h"
 #include <iostream>
 #include "Physics.h"
+#include "Scene_Gameover.h";
 
 
 Scene_Play::Scene_Play(GameEngine* engine)
@@ -117,6 +118,7 @@ void Scene_Play::tick()
 
 	handleCollisions();
 
+
 	timeUntilAsteroid--;
 	if (timeUntilAsteroid <= 0) 
 	{
@@ -133,6 +135,12 @@ void Scene_Play::tick()
 
 	_currentFrame++;
 	timeAlive++;
+
+	if (_entityManager.getComponent<Component::Health>(earth).health <= 0)
+	{
+		alive = false;
+		_engine->changeScene(std::make_shared<Scene_Gameover>(_engine), "GAME_OVER", true);
+	}
 }
 
 void Scene_Play::render()
@@ -223,11 +231,6 @@ void Scene_Play::handleCollisions()
 		{
 			_entityManager.destroyEntity(entity);
 			_entityManager.getComponent<Component::Health>(earth).damage(1);
-
-			if (_entityManager.getComponent<Component::Health>(earth).health <= 0)
-			{
-				alive = false;
-			}
 		}
 
 		if (Physics::isColliding(_entityManager, entity, shield))
@@ -242,7 +245,6 @@ void Scene_Play::handleCollisions()
 		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
 		auto& shieldTransform = _entityManager.getComponent<Component::Transform>(shield);
 
-		std::cout << abs(((int)(abs(transform.direction.angle(shieldTransform.direction)) * 180.0f / PI) % 360) - 180) << std::endl;
 		if (Physics::isColliding(_entityManager, entity, shield) && abs(((int)(abs(transform.direction.angle(shieldTransform.direction)) * 180.0f / PI) % 360) - 180) < 90)
 		{
 			
