@@ -128,6 +128,15 @@ namespace Component {
 		size_t ropeLength;
 		float segmentDistance;
 	};
+
+	class Lifespan : public Component 
+	{
+	public:
+		Lifespan() {}
+		Lifespan(size_t frames): frames(frames) {}
+
+		size_t frames;
+	};
 }
 
 

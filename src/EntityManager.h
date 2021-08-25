@@ -19,7 +19,8 @@ typedef std::tuple<
 	Component::Orbit[MAX_ENTITIES],
 	Component::CAnimation[MAX_ENTITIES],
 	Component::BoundingBox[MAX_ENTITIES],
-	Component::Rope[MAX_ENTITIES]
+	Component::Rope[MAX_ENTITIES],
+	Component::Lifespan[MAX_ENTITIES]
 > ComponentArrays;
 
 

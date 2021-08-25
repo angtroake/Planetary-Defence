@@ -18,6 +18,9 @@ void AssetManager::init()
 	//Gamma Stuff
 	addTexture("GammaWarning", "assets/img/gamma_warning.png");
 	createSprite("GammaWarning", getTexture("GammaWarning"));
+	addTexture("GammaRay", "assets/img/gamma.png");
+	createSprite("GammaRay", getTexture("GammaRay"), 5, 1, 5, 6);
+
 
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);

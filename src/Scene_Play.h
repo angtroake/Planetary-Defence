@@ -19,6 +19,7 @@ protected:
 	void handleMovement(Entity entity);
 	void handleOrbit(Entity entity);
 	void handleAnimations(Entity entity);
+	void handleLifespan(Entity entity);
 
 public:
 	Scene_Play(GameEngine* engine);
@@ -29,6 +30,7 @@ public:
 	void onKeyAction(std::string actionName, KeyAction action);
 
 	void spawnAsteroid();
-	void spawnGamma();
+	void spawnGammaWarning();
+	void spawnGamma(float angle);
 };
 

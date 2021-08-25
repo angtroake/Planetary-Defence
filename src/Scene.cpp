@@ -35,6 +35,12 @@ void Scene::renderEntity(const int & entity, bool debug)
 		mat.sprite.get().setOrigin((mat.sprite.getSize().x) / 2, (mat.sprite.getSize().y) / 2);
 		mat.sprite.get().setPosition(transfrom.position.x, transfrom.position.y);
 		mat.sprite.get().setScale({ transfrom.scale.x, transfrom.scale.y });
+
+		if (transfrom.rotates) 
+		{
+			mat.sprite.get().setRotation(Vec2(0, -1).angle(transfrom.direction) * 180.0f / PI);
+		}
+
 		if (mat.fragShader != nullptr) 
 		{
 			_engine->getWindow().draw(mat.sprite.get(), &*mat.fragShader);

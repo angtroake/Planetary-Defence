@@ -95,6 +95,8 @@ void Scene_Play::tick()
 			*rope.position = rope.segmentPositions[rope.ropeLength - 1] + rope.positionOffset;
 		}
 
+		
+		handleLifespan(entity);
 		handleAnimations(entity);
 		handleMovement(entity);
 		handleOrbit(entity);
@@ -112,7 +114,7 @@ void Scene_Play::tick()
 	timeUntilGamma--;
 	if (timeUntilGamma <= 0) 
 	{
-		spawnGamma();
+		spawnGammaWarning();
 		timeUntilGamma = 20 + rand() % (60 * 30);
 	}
 
@@ -221,6 +223,7 @@ void Scene_Play::handleMovement(Entity entity)
 		{
 			transform.prevPosition = transform.position;
 			transform.position = transform.position + transform.velocity;
+			transform.direction = transform.velocity / transform.velocity.mag();
 		}
 
 	}
@@ -252,6 +255,30 @@ void Scene_Play::handleOrbit(Entity entity)
 	}
 }
 
+void Scene_Play::handleLifespan(Entity entity) 
+{
+	//Lifespan Update
+	if (_entityManager.hasComponent<Component::Lifespan>(entity))
+	{
+		auto& lifespan = _entityManager.getComponent<Component::Lifespan>(entity);
+
+		lifespan.frames--;
+		if (lifespan.frames <= 0)
+		{
+
+			if (_entityManager.getTag(entity) == "GammaWarning")
+			{
+
+				auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+				auto& warningTransform = _entityManager.getComponent<Component::Transform>(entity);
+				spawnGamma(Vec2(-1, 0).angle(earthTransform.position - warningTransform.position));
+			}
+
+			_entityManager.destroyEntity(entity);
+		}
+	}
+}
+
 void Scene_Play::handleAnimations(Entity entity)
 {
 	//Sprite animations
@@ -277,12 +304,6 @@ void Scene_Play::handleAnimations(Entity entity)
 		{
 			_entityManager.removeComponent<Component::CAnimation>(entity);
 		}
-	}
-
-	//Gamma Warning Removal
-	if (_entityManager.getTag(entity) == "GammaWarning" && !_entityManager.hasComponent<Component::CAnimation>(entity)) 
-	{
-		_entityManager.destroyEntity(entity);
 	}
 }
 
@@ -333,7 +354,7 @@ void Scene_Play::spawnAsteroid()
 
 }
 
-void Scene_Play::spawnGamma()
+void Scene_Play::spawnGammaWarning()
 {
 	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
 
@@ -344,6 +365,23 @@ void Scene_Play::spawnGamma()
 	auto warning = _entityManager.createEntity("GammaWarning");
 	_entityManager.addComponent<Component::Transform>(warning, warningPos, Vec2(0,0), Vec2(0.5,0.5), false);
 	_entityManager.addComponent<Component::Material>(warning, _engine->getAssets().getSprite("GammaWarning"), true);
+	_entityManager.addComponent<Component::Lifespan>(warning, 5 * 60);
 	std::shared_ptr<AnimationBlink> ani = std::make_shared<AnimationBlink>(_engine, 60, 5 * 60);
 	_entityManager.addComponent<Component::CAnimation>(warning, ani);
+}
+
+void Scene_Play::spawnGamma(float angle) 
+{
+	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+
+	Vec2 gammaPos(4000 * sin(angle), 4000 * cos(angle));
+	gammaPos = gammaPos + earthTransform.position;
+	Vec2 vel = earthTransform.position - gammaPos;
+	vel = vel / vel.mag() * 50.0f;
+
+	auto gamma = _entityManager.createEntity("GammaRay");
+	_entityManager.addComponent<Component::Transform>(gamma, gammaPos, vel, Vec2(4, 6), true);
+	_entityManager.addComponent<Component::Material>(gamma, _engine->getAssets().getSprite("GammaRay"), true);
+	_entityManager.addComponent<Component::Lifespan>(gamma, 3 * 60);
+	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 60 * 5);
 }
