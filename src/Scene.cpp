@@ -140,7 +140,7 @@ void Scene::renderEntity(const int & entity, bool debug, std::string renderOnly)
 		float midCount = (diff.mag() - end.getSize().y) / mid.getSize().x;
 		int midCountInt = midCount;
 		if (midCount - (float)midCountInt > 0.5f) { midCount++; }
-		float midScale = 1.0f + (midCount - (float)midCountInt) / ((float)midCountInt - 1);
+		float midScale = ((diff.mag() - end.getSize().y) / midCountInt) / mid.getSize().y;
 
 		Vec2 startPos = *stick.anchor + (dir * end.getSize().y / 2.0f) + (dir * (mid.getSize().y * midScale / 2.0f));
 		for (int i = 0; i < midCountInt; i++) 

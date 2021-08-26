@@ -141,8 +141,6 @@ public:
 		}
 
 		_entitiesToDestroy.clear();
-
-		std::cout << "Ents: " << _entities.size() << std::endl;
 	}
 
 	//Helper functions for disabling components of destroyed entity ID.
