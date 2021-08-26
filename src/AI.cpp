@@ -18,16 +18,13 @@ void AIUFO::tick(GameEngine* engine)
 	if (timeToShoot <= 0) 
 	{
 		Vec2 vel = *target - *position;
-		vel = vel / vel.mag() * 2;
+		vel = vel / vel.mag() * 20.0f;
 
 		auto bullet = entityManager->createEntity("Bullet");
-		auto& t = entityManager->addComponent<Component::Transform>(bullet, *position, vel, Vec2(0.5,0.5), true);
-		auto& m = entityManager->addComponent<Component::Material>(bullet, engine->getAssets().getSprite("GammaRay"), true);
+		auto& t = entityManager->addComponent<Component::Transform>(bullet, *position, vel, Vec2(1,1), true);
+		auto& m = entityManager->addComponent<Component::Material>(bullet, engine->getAssets().getSprite("Laser"), true);
 		entityManager->addComponent<Component::Lifespan>(bullet, 5 * 60);
-		Vec2 bb = m.sprite.getSize();
-		bb.x *= t.scale.x;
-		bb.y *= t.scale.y;
-		entityManager->addComponent<Component::BoundingBox>(bullet, bb);
+		entityManager->addComponent<Component::BoundingBox>(bullet, m.sprite.getSize());
 
 		timeToShoot = 3 * 60 + (rand() % (3 * 60));
 	}
