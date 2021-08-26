@@ -119,6 +119,22 @@ void AssetManager::addShader(const std::string& name, const std::string path, co
 	}
 }
 
+void AssetManager::addSound(const std::string& name, const std::string path) 
+{
+	sf::SoundBuffer sound;
+
+	if (!sound.loadFromFile(path)) 
+	{
+		std::cerr << "Could not load sound file: " << path << std::endl;
+	}
+	else 
+	{
+		_sounds[name] = sf::Sound(sound);
+		_sounds[name].setVolume(20);
+	}
+
+}
+
 const sf::Texture& AssetManager::getTexture(const std::string& name) const
 {
 	assert(_textures.find(name) != _textures.end());
@@ -141,4 +157,10 @@ const std::shared_ptr<sf::Shader> & AssetManager::getShader(const std::string& n
 {
 	assert(_shaders.find(name) != _shaders.end());
 	return _shaders.at(name);
+}
+
+const  sf::Sound& AssetManager::getSound(const std::string& name) const
+{
+	assert(_sounds.find(name) != _sounds.end());
+	return _sounds.at(name);
 }
