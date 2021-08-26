@@ -18,13 +18,13 @@ void Scene_Play::init()
 	registerKeyAction(sf::Keyboard::BackSlash, "DEBUG");
 	registerKeyAction(sf::Keyboard::Down, "DOWN");
 	registerKeyAction(sf::Keyboard::Up, "UP");
-	registerKeyAction(sf::Keyboard::Left, "LEFT");
-	registerKeyAction(sf::Keyboard::Right, "RIGHT");
+	registerKeyAction(sf::Keyboard::Left, "SATELLITE_LEFT");
+	registerKeyAction(sf::Keyboard::Right, "SATELLITE_RIGHT");
+	registerKeyAction(sf::Keyboard::Space, "SATELLITE_SHOOT");
 	registerKeyAction(sf::Keyboard::S, "DOWN");
 	registerKeyAction(sf::Keyboard::W, "UP");
-	registerKeyAction(sf::Keyboard::A, "LEFT");
-	registerKeyAction(sf::Keyboard::D, "RIGHT");
-	registerKeyAction(sf::Keyboard::Space, "SHOOT");
+	registerKeyAction(sf::Keyboard::A, "SHIELD_LEFT");
+	registerKeyAction(sf::Keyboard::D, "SHIELD_RIGHT");
 
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid1"));
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid2"));
@@ -42,10 +42,17 @@ void Scene_Play::init()
 	shield = _entityManager.createEntity("Shield");
 	auto & shieldTransform = _entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
 	_entityManager.addComponent<Component::Material>(shield, _engine->getAssets().getSprite("Shield"), true);
-	_entityManager.addComponent<Component::Orbit>(shield, &earthTransfrom.position, 300, 0.01, true, 0, true, true);
+	_entityManager.addComponent<Component::Orbit>(shield, &earthTransfrom.position, 350, 0.01, true, 0, true, true);
 	_entityManager.addComponent<Component::Input>(shield);
 	_entityManager.addComponent<Component::BoundingBox>(shield, Vec2(250, 50));
 	_entityManager.addComponent<Component::PopsicleStick>(shield, &earthTransfrom.position, &shieldTransform.position, false);
+
+	satellite = _entityManager.createEntity("Satellite");
+	auto& satelliteTransform = _entityManager.addComponent<Component::Transform>(satellite, Vec2(0, 0), Vec2(0, 0), Vec2(0.5, 0.5), true);
+	_entityManager.addComponent<Component::Material>(satellite, _engine->getAssets().getSprite("SatelliteCharge"), true);
+	_entityManager.addComponent<Component::Orbit>(satellite, &earthTransfrom.position, 300, 0.01, true, 0, true, true);
+	_entityManager.addComponent<Component::Input>(satellite);
+	_entityManager.addComponent<Component::PopsicleStick>(satellite, &earthTransfrom.position, &satelliteTransform.position, false);
 }
 
 void Scene_Play::tick()
@@ -126,6 +133,16 @@ void Scene_Play::tick()
 
 	handleCollisions();
 
+
+	if (satelliteCooldown > 0) 
+	{
+		satelliteCooldown--;
+	}
+	else if (!_entityManager.getComponent<Component::Input>(satellite).canShoot) 
+	{
+		_entityManager.getComponent<Component::Input>(satellite).canShoot = true;
+		_entityManager.getComponent<Component::Material>(satellite).sprite = _engine->getAssets().getSprite("SatelliteReady");
+	}
 
 	timeUntilAsteroid--;
 	if (timeUntilAsteroid <= 0) 
@@ -292,6 +309,27 @@ void Scene_Play::handleCollisions()
 			health.health -= 1;
 		}
 	}
+
+	for (Entity entity : _entityManager.getEntities("SatelliteBullet"))
+	{
+		for (Entity enemy : _entityManager.getEntities("Asteroid")) 
+		{
+			if (Physics::isColliding(_entityManager, entity, enemy))
+			{
+				_entityManager.destroyEntity(entity);
+				_entityManager.destroyEntity(enemy);
+			}
+		}
+		
+		for (Entity enemy : _entityManager.getEntities("UFO"))
+		{
+			if (Physics::isColliding(_entityManager, entity, enemy))
+			{
+				_entityManager.destroyEntity(entity);
+				_entityManager.destroyEntity(enemy);
+			}
+		}
+	}
 }
 
 void Scene_Play::handleMovement(Entity entity)
@@ -334,6 +372,25 @@ void Scene_Play::handleControls(Entity entity)
 			else
 			{
 				orbit.moving = false;
+			}
+		}
+
+		if (entity == satellite)
+		{
+			if (input.canShoot && input.shoot) 
+			{
+				auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+
+				auto bullet = _entityManager.createEntity("SatelliteBullet");
+				_entityManager.addComponent<Component::Transform>(bullet, transform.position, transform.direction * 20.0f, Vec2(1,1), true);
+				auto &mat =_entityManager.addComponent<Component::Material>(bullet, _engine->getAssets().getSprite("Laser"), true);
+				_entityManager.addComponent<Component::BoundingBox>(bullet, mat.sprite.getSize());
+				
+
+				satelliteCooldown = satelliteCooldownMax;
+				input.canShoot = false;
+				_entityManager.getComponent<Component::Material>(entity).sprite = _engine->getAssets().getSprite("SatelliteCharge");
+
 			}
 		}
 	}
@@ -446,36 +503,63 @@ void Scene_Play::onKeyAction(std::string actionName, KeyAction action)
 	{
 		_engine->changeScene(nullptr, "MAIN_MENU", true);
 	}
-	if (actionName == "DEBUG" && action.type == ActionType::KEY_PRESS) 
+	else if (actionName == "DEBUG" && action.type == ActionType::KEY_PRESS) 
 	{
 		renderDebug = !renderDebug;
 	}
-	if (actionName == "LEFT")
+	else if (actionName == "SHIELD_LEFT")
 	{
-		for (auto entity : _entityManager.getEntities("Shield"))
+		if (action.type == ActionType::KEY_PRESS)
 		{
-			if (action.type == ActionType::KEY_PRESS)
-			{
-				_entityManager.getComponent<Component::Input>(entity).cw = true;
-			}
-			else if (action.type == ActionType::KEY_RELEASE)
-			{
-				_entityManager.getComponent<Component::Input>(entity).cw = false;
-			}
+			_entityManager.getComponent<Component::Input>(shield).cw = true;
+		}
+		else if (action.type == ActionType::KEY_RELEASE)
+		{
+			_entityManager.getComponent<Component::Input>(shield).cw = false;
 		}
 	}
-	if (actionName == "RIGHT")
+	else if (actionName == "SHIELD_RIGHT")
 	{
-		for (auto entity : _entityManager.getEntities("Shield"))
+		if (action.type == ActionType::KEY_PRESS)
 		{
-			if (action.type == ActionType::KEY_PRESS)
-			{
-				_entityManager.getComponent<Component::Input>(entity).ccw = true;
-			}
-			else if (action.type == ActionType::KEY_RELEASE)
-			{
-				_entityManager.getComponent<Component::Input>(entity).ccw = false;
-			}
+			_entityManager.getComponent<Component::Input>(shield).ccw = true;
+		}
+		else if (action.type == ActionType::KEY_RELEASE)
+		{
+			_entityManager.getComponent<Component::Input>(shield).ccw = false;
+		}
+	}
+	else if (actionName == "SATELLITE_LEFT")
+	{
+		if (action.type == ActionType::KEY_PRESS)
+		{
+			_entityManager.getComponent<Component::Input>(satellite).cw = true;
+		}
+		else if (action.type == ActionType::KEY_RELEASE)
+		{
+			_entityManager.getComponent<Component::Input>(satellite).cw = false;
+		}
+	}
+	else if (actionName == "SATELLITE_RIGHT") 
+	{
+		if (action.type == ActionType::KEY_PRESS)
+		{
+			_entityManager.getComponent<Component::Input>(satellite).ccw = true;
+		}
+		else if (action.type == ActionType::KEY_RELEASE)
+		{
+			_entityManager.getComponent<Component::Input>(satellite).ccw = false;
+		}
+	}
+	else if (actionName == "SATELLITE_SHOOT") 
+	{
+		if (action.type == ActionType::KEY_PRESS)
+		{
+			_entityManager.getComponent<Component::Input>(satellite).shoot = true;
+		}
+		else if (action.type == ActionType::KEY_RELEASE)
+		{
+			_entityManager.getComponent<Component::Input>(satellite).shoot = false;
 		}
 	}
 }

@@ -18,7 +18,10 @@ namespace Component {
 	{
 	public:
 		Transform() {}
-		Transform(Vec2 pos, Vec2 vel, Vec2 scale, bool rot) : position(pos), velocity(vel), scale(scale), rotates(rot) {}
+		Transform(Vec2 pos, Vec2 vel, Vec2 scale, bool rot) : position(pos), velocity(vel), scale(scale), rotates(rot) 
+		{
+			if (rotates && vel.mag() != 0) { direction = vel / vel.mag(); }
+		}
 
 		Vec2 position;
 		Vec2 prevPosition;
@@ -82,7 +85,7 @@ namespace Component {
 		bool left = false;
 		bool right = false;
 		bool shoot = false;
-		bool canShoot = true;
+		bool canShoot = false;
 
 		Input() {}
 	};

@@ -39,6 +39,12 @@ void AssetManager::init()
 	addTexture("Laser", "assets/img/laser.png");
 	createSprite("Laser", getTexture("Laser"));
 
+	//Satellite Turret
+	addTexture("SatelliteReady", "assets/img/satellite_ready.png");
+	createSprite("SatelliteReady", getTexture("SatelliteReady"));
+	addTexture("SatelliteCharge", "assets/img/satellite_charge.png");
+	createSprite("SatelliteCharge", getTexture("SatelliteCharge"));
+
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
 	addShader("String", "assets/shaders/string.frag", ShaderType::FRAGMENT);
