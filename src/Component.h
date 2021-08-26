@@ -2,7 +2,9 @@
 #include "base.h"
 #include "Sprite.h"
 #include "Animation.h"
+#include "AI.h"
 
+class AI;
 
 const int MAX_COMPONENTS = 32;
  
@@ -162,6 +164,15 @@ namespace Component {
 		bool movementOnAnchor;
 	protected:
 		Vec2 _anchor;
+	};
+
+	class CAI : public Component 
+	{
+	public:
+		CAI() {}
+		CAI(std::shared_ptr<AI> ai): ai(ai) {}
+		
+		std::shared_ptr<AI> ai;
 	};
 }
 

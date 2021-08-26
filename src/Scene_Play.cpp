@@ -110,6 +110,13 @@ void Scene_Play::tick()
 			}
 		}
 
+		//AI TICK
+		if (_entityManager.hasComponent<Component::CAI>(entity)) 
+		{
+			_entityManager.getComponent<Component::CAI>(entity).ai->simulate(_engine);
+		}
+
+
 		handleControls(entity);
 		handleLifespan(entity);
 		handleOrbit(entity);
@@ -269,6 +276,20 @@ void Scene_Play::handleCollisions()
 		{
 			auto& health = _entityManager.getComponent<Component::Health>(earth);
 			health.health -= health.maxHealth;
+		}
+	}
+
+	for (Entity entity : _entityManager.getEntities("Bullet")) 
+	{
+		if (Physics::isColliding(_entityManager, entity, shield))
+		{
+			_entityManager.destroyEntity(entity);
+		}
+		else if (Physics::isColliding(_entityManager, entity, earth)) 
+		{
+			_entityManager.destroyEntity(entity);
+			auto& health = _entityManager.getComponent<Component::Health>(earth);
+			health.health -= 1;
 		}
 	}
 }
@@ -541,6 +562,9 @@ void Scene_Play::spawnUFO()
 	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 120);
 	ani->init(entity, _entityManager);
 	_entityManager.addComponent<Component::CAnimation>(entity, ani);
+
+	std::shared_ptr<AIUFO> ai = std::make_shared<AIUFO>(&transform.position, &earthTransform.position, &_entityManager);
+	_entityManager.addComponent<Component::CAI>(entity, ai);
 
 	size_t ropeSegs = 20;
 	float segDist = (_engine->getWindow().getSize().y) / ropeSegs;
