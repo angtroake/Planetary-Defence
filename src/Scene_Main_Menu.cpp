@@ -19,6 +19,8 @@ void Scene_Main_Menu::init()
 	registerKeyAction(sf::Keyboard::Enter, "ENTER");
 	registerKeyAction(sf::Keyboard::Space, "ENTER");
 
+	_engine->getAssets().getSound("MusicMenu").play();
+
 	auto earth = _entityManager.createEntity("Earth");
 	_entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindowSize().x/2, _engine->getWindowSize().y), Vec2(0,0), Vec2(3,3), false);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
@@ -102,6 +104,7 @@ void Scene_Main_Menu::onKeyAction(std::string actionName, KeyAction action)
 		//Play Button
 		if (selectedMenuButton == 0) 
 		{
+			_engine->stopSounds();
 			_engine->changeScene(std::make_shared<Scene_Play>(_engine), "PLAY", false);
 		}
 		//Options Screen

@@ -12,6 +12,8 @@ private:
 	std::map<std::string, Sprite> _sprites;
 	std::map<std::string, std::shared_ptr<sf::Shader>> _shaders;
 	std::map<std::string, sf::Sound> _sounds;
+	std::map<std::string, sf::SoundBuffer> _soundBuffers;
+
 	void addFont(const std::string name, const std::string path);
 	void addTexture(const std::string& name, const std::string& path);
 	void createSprite(const std::string& name, const sf::Texture& texture);
@@ -26,5 +28,8 @@ public:
 	const sf::Font& getFont(const std::string& name) const;
 	const Sprite& getSprite(const std::string& name) const;
 	const std::shared_ptr<sf::Shader> & getShader(const std::string& name) const;
-	const sf::Sound& getSound(const std::string& name) const;
+	sf::Sound& getSound(const std::string& name);
+	
+	void setGlobalSoundVolume(float volume);
+	void stopAllSounds();
 };

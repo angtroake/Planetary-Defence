@@ -45,6 +45,9 @@ void AssetManager::init()
 	addTexture("SatelliteCharge", "assets/img/satellite_charge.png");
 	createSprite("SatelliteCharge", getTexture("SatelliteCharge"));
 
+	//Music
+	addSound("MusicMenu", "assets/music/Cyberspace.ogg");
+
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
 	addShader("String", "assets/shaders/string.frag", ShaderType::FRAGMENT);
@@ -129,7 +132,8 @@ void AssetManager::addSound(const std::string& name, const std::string path)
 	}
 	else 
 	{
-		_sounds[name] = sf::Sound(sound);
+		_soundBuffers[name] = sound;
+		_sounds[name] = sf::Sound(_soundBuffers[name]);
 		_sounds[name].setVolume(20);
 	}
 
@@ -159,8 +163,26 @@ const std::shared_ptr<sf::Shader> & AssetManager::getShader(const std::string& n
 	return _shaders.at(name);
 }
 
-const  sf::Sound& AssetManager::getSound(const std::string& name) const
+sf::Sound& AssetManager::getSound(const std::string& name)
 {
 	assert(_sounds.find(name) != _sounds.end());
 	return _sounds.at(name);
 }
+
+void AssetManager::stopAllSounds()
+{
+	for (auto iter = _sounds.begin(); iter != _sounds.end(); iter++) 
+	{
+		(*iter).second.stop();
+	}
+
+}
+
+void AssetManager::setGlobalSoundVolume(float volume) 
+{
+	for (auto iter = _sounds.begin(); iter != _sounds.end(); iter++)
+	{
+		(*iter).second.setVolume(volume);
+	}
+}
+

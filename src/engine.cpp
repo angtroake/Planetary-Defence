@@ -32,7 +32,21 @@ void GameEngine::update()
 {
 	if (_sceneMap.empty()) { return; }
 
+	if (soundFadeFactor > 0.0 && fadeSounds) 
+	{
+		soundFadeFactor -= soundFadeDecrease;
+		getAssets().setGlobalSoundVolume(100 * soundFadeFactor);
+	}
+	else if(fadeSounds)
+	{
+		fadeSounds = false;
+		soundFadeFactor = 0;
+		stopSounds();
+		getAssets().setGlobalSoundVolume(20);
+	}
+
 	handleInput();
+
 
 	if (!_isRunning) { return; }
 
@@ -116,4 +130,15 @@ AssetManager & GameEngine::getAssets()
 const sf::Vector2u & GameEngine::getWindowSize() const 
 {
 	return _window.getSize();
+}
+
+void GameEngine::fadePlayingSounds()
+{
+	fadeSounds = true;
+	soundFadeFactor = 1.0f;
+}
+
+void GameEngine::stopSounds()
+{
+	getAssets().stopAllSounds();
 }

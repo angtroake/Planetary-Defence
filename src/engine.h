@@ -14,7 +14,9 @@ public:
 
 	sf::RenderWindow & getWindow();
 	const sf::Vector2u & getWindowSize() const;
-
+	
+	void fadePlayingSounds();
+	void stopSounds();
 protected:
 	
 	sf::RenderWindow _window;
@@ -24,8 +26,14 @@ protected:
 	std::map<std::string, std::shared_ptr<Scene>> _sceneMap;
 	AssetManager _assets;
 
+	float soundFadeFactor = 0.0f;
+	float soundFadeDecrease = 0.01f;
+	bool fadeSounds = false;
+
 	void init();
 	void update();
 	void handleInput();
+
+
 
 };
