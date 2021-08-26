@@ -47,6 +47,8 @@ void AssetManager::init()
 
 	//Music
 	addSound("MusicMenu", "assets/music/Cyberspace.ogg");
+	addSound("MusicPlay0", "assets/music/Dungeon1.ogg");
+	addSound("MusicPlay1", "assets/music/Dungeon2.ogg");
 
 	//Sounds
 	addSound("Laser1", "assets/sounds/laser1.wav");

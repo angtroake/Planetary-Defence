@@ -19,6 +19,10 @@ protected:
 
 	std::vector<Sprite> _asteroidSprites;
 
+	sf::Sound* currentMusic = nullptr;
+	const size_t musicTrackCount = 2;
+	size_t currentMusicTrack;
+
 	bool renderDebug = false;
 	bool alive = true;
 

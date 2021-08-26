@@ -53,6 +53,10 @@ void Scene_Play::init()
 	_entityManager.addComponent<Component::Orbit>(satellite, &earthTransfrom.position, 300, 0.01, true, 0, true, true);
 	_entityManager.addComponent<Component::Input>(satellite);
 	_entityManager.addComponent<Component::PopsicleStick>(satellite, &earthTransfrom.position, &satelliteTransform.position, false);
+
+	currentMusicTrack = rand() % musicTrackCount;
+	currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
+	currentMusic->play();
 }
 
 void Scene_Play::tick()
@@ -166,14 +170,28 @@ void Scene_Play::tick()
 		timeUntilUFO = rand() % 600;
 	}
 
+
+	if (currentMusic != nullptr)
+	{
+		if (currentMusic->getStatus() == sf::SoundSource::Status::Stopped)
+		{
+			currentMusicTrack = (currentMusicTrack + 1) % musicTrackCount;
+			currentMusic->stop();
+			currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
+			currentMusic->play();
+		}
+	}
+
 	_currentFrame++;
 	timeAlive++;
+
 
 	if (_entityManager.getComponent<Component::Health>(earth).health <= 0)
 	{
 		alive = false;
-		_engine->changeScene(std::make_shared<Scene_Gameover>(_engine), "GAME_OVER", true);
+		//_engine->changeScene(std::make_shared<Scene_Gameover>(_engine), "GAME_OVER", true);
 	}
+
 }
 
 void Scene_Play::render()
@@ -208,11 +226,6 @@ void Scene_Play::render()
 	}
 
 	renderHealth();
-
-	if (!alive)
-	{
-		_engine->changeScene(NULL, "MAIN_MENU", true);
-	}
 }
 
 void Scene_Play::renderHealth()
@@ -386,6 +399,7 @@ void Scene_Play::handleControls(Entity entity)
 				_entityManager.addComponent<Component::Transform>(bullet, transform.position, transform.direction * 20.0f, Vec2(1,1), true);
 				auto &mat =_entityManager.addComponent<Component::Material>(bullet, _engine->getAssets().getSprite("Laser"), true);
 				_entityManager.addComponent<Component::BoundingBox>(bullet, mat.sprite.getSize());
+				_entityManager.addComponent<Component::Lifespan>(bullet, 3 * 60);
 				
 				int num = rand() % 4 + 1;
 				_engine->getAssets().getSound("Laser" + std::to_string(num)).play();

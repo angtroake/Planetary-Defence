@@ -53,7 +53,7 @@ namespace Component {
 		
 		void damage(size_t amount) { health -= amount; }
 
-		size_t health;
+		int health;
 		size_t maxHealth;
 
 	};
@@ -152,7 +152,7 @@ namespace Component {
 		Lifespan() {}
 		Lifespan(size_t frames): frames(frames) {}
 
-		size_t frames;
+		int frames;
 	};
 
 	class PopsicleStick : public Component 

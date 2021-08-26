@@ -23,7 +23,7 @@ void AIUFO::tick(GameEngine* engine)
 		auto bullet = entityManager->createEntity("Bullet");
 		auto& t = entityManager->addComponent<Component::Transform>(bullet, *position, vel, Vec2(1,1), true);
 		auto& m = entityManager->addComponent<Component::Material>(bullet, engine->getAssets().getSprite("Laser"), true);
-		entityManager->addComponent<Component::Lifespan>(bullet, 5 * 60);
+		entityManager->addComponent<Component::Lifespan>(bullet, 3 * 60);
 		entityManager->addComponent<Component::BoundingBox>(bullet, m.sprite.getSize());
 	
 		int num = rand() % 4 + 1;

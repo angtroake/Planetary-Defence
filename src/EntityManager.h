@@ -3,6 +3,7 @@
 #include <bitset>
 #include <assert.h>
 #include "Component.h"
+#include <iostream>
 
 
 
@@ -140,6 +141,8 @@ public:
 		}
 
 		_entitiesToDestroy.clear();
+
+		std::cout << "Ents: " << _entities.size() << std::endl;
 	}
 
 	//Helper functions for disabling components of destroyed entity ID.
