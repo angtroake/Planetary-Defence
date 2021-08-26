@@ -35,8 +35,8 @@ void AssetManager::init()
 	addTexture("UFO", "assets/img/ufo.png");
 	createSprite("UFO", getTexture("UFO"), 15, 14, 200, 1);
 
-	//Lazer
-	addTexture("Laser", "assets/img/laser.png");
+	//Laser
+	addTexture("Laser", "assets/img/laser_short.png");
 	createSprite("Laser", getTexture("Laser"));
 
 	//Satellite Turret

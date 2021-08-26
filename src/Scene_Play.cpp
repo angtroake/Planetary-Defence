@@ -29,28 +29,33 @@ void Scene_Play::init()
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid1"));
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid2"));
 
+
+	Vec2 ropePos(_engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f - 148);
+	size_t ropeSegs = 20;
+	float segDist = ropePos.y / ropeSegs;
+
 	earth = _entityManager.createEntity("Earth");
-	auto & earthTransfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -100), Vec2(0,0), Vec2(1,1), true);
+	auto & earthTransfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 250, -200), Vec2(0,0), Vec2(0.8,0.8), true);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 	_entityManager.addComponent<Component::Health>(earth, 100);
 	_entityManager.addComponent<Component::BoundingBox>(earth, Vec2(256, 256));
+	_entityManager.addComponent<Component::Rope>(earth, 20, segDist, Vec2(_engine->getWindow().getSize().x / 2, 0), &earthTransfrom.position, &earthTransfrom.direction, Vec2(0, 148), true);
 	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
 	//ani->init(earth, _entityManager);
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
-	_entityManager.addComponent<Component::Rope>(earth, 20, 20.0f, Vec2(_engine->getWindow().getSize().x / 2, 0), &earthTransfrom.position, &earthTransfrom.direction, Vec2(0, 185), true);
 
 	shield = _entityManager.createEntity("Shield");
-	auto & shieldTransform = _entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
+	auto & shieldTransform = _entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 0.7), true);
 	_entityManager.addComponent<Component::Material>(shield, _engine->getAssets().getSprite("Shield"), true);
-	_entityManager.addComponent<Component::Orbit>(shield, &earthTransfrom.position, 350, 0.01, true, 0, true, true);
+	_entityManager.addComponent<Component::Orbit>(shield, &earthTransfrom.position, 300, 0.01, true, 0, true, true);
 	_entityManager.addComponent<Component::Input>(shield);
 	_entityManager.addComponent<Component::BoundingBox>(shield, Vec2(250, 50));
 	_entityManager.addComponent<Component::PopsicleStick>(shield, &earthTransfrom.position, &shieldTransform.position, false);
 
 	satellite = _entityManager.createEntity("Satellite");
-	auto& satelliteTransform = _entityManager.addComponent<Component::Transform>(satellite, Vec2(0, 0), Vec2(0, 0), Vec2(0.5, 0.5), true);
+	auto& satelliteTransform = _entityManager.addComponent<Component::Transform>(satellite, Vec2(0, 0), Vec2(0, 0), Vec2(0.4, 0.4), true);
 	_entityManager.addComponent<Component::Material>(satellite, _engine->getAssets().getSprite("SatelliteCharge"), true);
-	_entityManager.addComponent<Component::Orbit>(satellite, &earthTransfrom.position, 300, 0.01, true, 0, true, true);
+	_entityManager.addComponent<Component::Orbit>(satellite, &earthTransfrom.position, 225, 0.01, true, 0, true, true);
 	_entityManager.addComponent<Component::Input>(satellite);
 	_entityManager.addComponent<Component::PopsicleStick>(satellite, &earthTransfrom.position, &satelliteTransform.position, false);
 
@@ -396,8 +401,8 @@ void Scene_Play::handleControls(Entity entity)
 				auto& transform = _entityManager.getComponent<Component::Transform>(entity);
 
 				auto bullet = _entityManager.createEntity("SatelliteBullet");
-				_entityManager.addComponent<Component::Transform>(bullet, transform.position, transform.direction * 20.0f, Vec2(1,1), true);
 				auto &mat =_entityManager.addComponent<Component::Material>(bullet, _engine->getAssets().getSprite("Laser"), true);
+				_entityManager.addComponent<Component::Transform>(bullet, transform.position + transform.direction * mat.sprite.getSize().y, transform.direction * 20.0f, Vec2(1,1), true);
 				_entityManager.addComponent<Component::BoundingBox>(bullet, mat.sprite.getSize());
 				_entityManager.addComponent<Component::Lifespan>(bullet, 3 * 60);
 				
