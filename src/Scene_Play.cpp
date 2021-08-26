@@ -140,6 +140,7 @@ void Scene_Play::tick()
 	}
 	else if (!_entityManager.getComponent<Component::Input>(satellite).canShoot) 
 	{
+		_engine->getAssets().getSound("SatelliteReady").play();
 		_entityManager.getComponent<Component::Input>(satellite).canShoot = true;
 		_entityManager.getComponent<Component::Material>(satellite).sprite = _engine->getAssets().getSprite("SatelliteReady");
 	}
@@ -386,6 +387,8 @@ void Scene_Play::handleControls(Entity entity)
 				auto &mat =_entityManager.addComponent<Component::Material>(bullet, _engine->getAssets().getSprite("Laser"), true);
 				_entityManager.addComponent<Component::BoundingBox>(bullet, mat.sprite.getSize());
 				
+				int num = rand() % 4 + 1;
+				_engine->getAssets().getSound("Laser" + std::to_string(num)).play();
 
 				satelliteCooldown = satelliteCooldownMax;
 				input.canShoot = false;

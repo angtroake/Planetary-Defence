@@ -48,9 +48,17 @@ void AssetManager::init()
 	//Music
 	addSound("MusicMenu", "assets/music/Cyberspace.ogg");
 
+	//Sounds
+	addSound("Laser1", "assets/sounds/laser1.wav");
+	addSound("Laser2", "assets/sounds/laser2.wav");
+	addSound("Laser3", "assets/sounds/laser3.wav");
+	addSound("Laser4", "assets/sounds/laser4.wav");
+
+	addSound("SatelliteReady", "assets/sounds/satellite_ready.wav");
+
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
-	addShader("String", "assets/shaders/string.frag", ShaderType::FRAGMENT);
+	//addShader("String", "assets/shaders/string.frag", ShaderType::FRAGMENT);
 }
 
 void AssetManager::addFont(const std::string name, const std::string path) 
