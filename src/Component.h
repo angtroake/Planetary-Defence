@@ -57,14 +57,17 @@ namespace Component {
 	{
 	public:
 		Orbit() {}
-		Orbit(Entity target, float distance, float speed, bool cw): target(target), distance(distance), speed(speed), clockWise(cw) {}
+		Orbit(Vec2* target, float distance, float speed, bool cw, float startAngle, bool transformDirection, bool stickToDistance) 
+			: target(target), distance(distance), speed(speed), clockWise(cw), currentAngle(startAngle), transformDirection(transformDirection), stickToDistance(stickToDistance){}
 
-		Entity target;
+		Vec2* target;
 		float distance;
 		float speed;
 		bool clockWise;
 		bool moving = false;
 		float currentAngle = 0;
+		bool stickToDistance;
+		bool transformDirection;
 	};
 
 	class Input : public Component

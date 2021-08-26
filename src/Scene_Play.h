@@ -10,6 +10,7 @@ protected:
 
 	size_t timeUntilAsteroid = 120;
 	size_t timeUntilGamma = 300;
+	size_t timeUntilUFO = 160;
 
 	std::vector<Sprite> _asteroidSprites;
 
@@ -21,6 +22,7 @@ protected:
 	void handleOrbit(Entity entity);
 	void handleAnimations(Entity entity);
 	void handleLifespan(Entity entity);
+	void handleControls(Entity entity);
 
 public:
 	Scene_Play(GameEngine* engine);
@@ -33,5 +35,6 @@ public:
 	void spawnAsteroid();
 	void spawnGammaWarning();
 	void spawnGamma(Vec2 dir);
+	void spawnUFO();
 };
 

@@ -42,7 +42,7 @@ void Scene_Play::init()
 	shield = _entityManager.createEntity("Shield");
 	auto & shieldTransform = _entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 1), true);
 	_entityManager.addComponent<Component::Material>(shield, _engine->getAssets().getSprite("Shield"), true);
-	_entityManager.addComponent<Component::Orbit>(shield, earth, 300, 0.01, true);
+	_entityManager.addComponent<Component::Orbit>(shield, &earthTransfrom.position, 300, 0.01, true, 0, true, true);
 	_entityManager.addComponent<Component::Input>(shield);
 	_entityManager.addComponent<Component::BoundingBox>(shield, Vec2(250, 50));
 	_entityManager.addComponent<Component::PopsicleStick>(shield, &earthTransfrom.position, &shieldTransform.position, false);
@@ -110,6 +110,7 @@ void Scene_Play::tick()
 			}
 		}
 
+		handleControls(entity);
 		handleLifespan(entity);
 		handleOrbit(entity);
 		handleAnimations(entity);
@@ -131,6 +132,13 @@ void Scene_Play::tick()
 	{
 		spawnGammaWarning();
 		timeUntilGamma = 20 + rand() % (60 * 30);
+	}
+
+	timeUntilUFO--;
+	if (timeUntilUFO <= 0) 
+	{
+		spawnUFO();
+		timeUntilUFO = rand() % 600;
 	}
 
 	_currentFrame++;
@@ -283,48 +291,77 @@ void Scene_Play::handleMovement(Entity entity)
 			if (!_entityManager.hasComponent<Component::Orbit>(entity)) {
 				transform.direction = transform.velocity / transform.velocity.mag();
 			}
-
 		}
 
 	}
 }
 
+void Scene_Play::handleControls(Entity entity)
+{
+	if (_entityManager.hasComponent<Component::Input>(entity))
+	{
+		auto& input = _entityManager.getComponent<Component::Input>(entity);
+
+		if (_entityManager.hasComponent<Component::Orbit>(entity))
+		{
+			auto& orbit = _entityManager.getComponent<Component::Orbit>(entity);
+			if (input.ccw != input.cw)
+			{
+				orbit.clockWise = input.cw;
+				orbit.moving = true;
+			}
+			else
+			{
+				orbit.moving = false;
+			}
+		}
+	}
+}
+
 void Scene_Play::handleOrbit(Entity entity)
 {
+
+	if (_entityManager.hasComponent<Component::CAnimation>(entity)) 
+	{
+		return;
+	}
+
 	if (_entityManager.hasComponent<Component::Orbit>(entity))
 	{
 		auto& orbit = _entityManager.getComponent<Component::Orbit>(entity);
 		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
-		auto& input = _entityManager.getComponent<Component::Input>(entity);
 
-		if (input.ccw != input.cw)
-		{
-			orbit.clockWise = input.cw;
-			orbit.moving = true;
-		}
-		else
-		{
-			orbit.moving = false;
+		float nextAngle = orbit.currentAngle;
+
+		if (orbit.moving) {
+			if (orbit.clockWise) { nextAngle = orbit.currentAngle + orbit.speed; }
+			else { nextAngle = orbit.currentAngle - orbit.speed; }
 		}
 
-		if (_entityManager.isAlive(orbit.target))
+		if (nextAngle > 2.0f * PI) { nextAngle -= 2.0f * PI; }
+		else if (nextAngle < 0) { nextAngle += 2.0f * PI; }
+
+		Vec2 curr(orbit.distance * sin(orbit.currentAngle), orbit.distance * cos(orbit.currentAngle));
+		curr = *orbit.target + curr;
+
+		Vec2 next(orbit.distance * sin(nextAngle), orbit.distance * cos(nextAngle));
+		next = *orbit.target + next;
+
+		transform.prevVelocity = transform.velocity;
+		if (orbit.stickToDistance) {
+			transform.velocity = next - transform.position;
+		}
+		else 
 		{
-			auto& target_transform = _entityManager.getComponent<Component::Transform>(orbit.target);
-
-			if (orbit.clockWise) { orbit.currentAngle = orbit.currentAngle + (orbit.moving ? orbit.speed : 0); }
-			else { orbit.currentAngle = orbit.currentAngle - (orbit.moving ? orbit.speed : 0); }
-
-			if (orbit.currentAngle > 2.0f * PI) { orbit.currentAngle -= 2.0f * PI; }
-			else if (orbit.currentAngle < 0) { orbit.currentAngle += 2.0f * PI; }
-
-			Vec2 vec(orbit.distance * sin(orbit.currentAngle), orbit.distance * cos(orbit.currentAngle));
-			vec = target_transform.position + vec;
-
-			transform.prevVelocity = transform.velocity;
-			transform.velocity = vec - transform.position;
-			transform.direction = transform.position - target_transform.position;
+			transform.velocity = next - curr;
+		}
+		
+		if (orbit.transformDirection) {
+			transform.direction = transform.position - *orbit.target;
 			transform.direction = transform.direction / transform.direction.mag();
 		}
+
+		orbit.currentAngle = nextAngle;
 	}
 }
 
@@ -483,4 +520,34 @@ void Scene_Play::spawnGamma(Vec2 dir)
 	bbSize.y *= 6;
 	_entityManager.addComponent<Component::BoundingBox>(gamma, bbSize );
 	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 60 * 5);
+}
+
+void Scene_Play::spawnUFO() 
+{
+	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+
+	float angle = (float)(rand() % 360) * PI / 180.0f;
+	float dist = 300 + rand() % 200;
+
+	Vec2 pos(dist * sin(angle), dist * cos(angle));
+	pos = earthTransform.position + pos;
+	
+	auto entity = _entityManager.createEntity("UFO");
+	auto& transform = _entityManager.addComponent<Component::Transform>(entity, Vec2(pos.x + 10, -100), Vec2(0,0), Vec2(1, 1), true);
+	_entityManager.addComponent<Component::Health>(entity, 1);
+	auto& mat = _entityManager.addComponent<Component::Material>(entity, _engine->getAssets().getSprite("UFO"), true);
+	_entityManager.addComponent<Component::BoundingBox>(entity, (mat.sprite.getSize() * 0.4f));
+
+	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 120);
+	ani->init(entity, _entityManager);
+	_entityManager.addComponent<Component::CAnimation>(entity, ani);
+
+	size_t ropeSegs = 20;
+	float segDist = (_engine->getWindow().getSize().y) / ropeSegs;
+	_entityManager.addComponent<Component::Rope>(entity, ropeSegs, segDist, Vec2(pos.x, pos.y - segDist*ropeSegs), &transform.position, &transform.direction, Vec2(0, 28), true);
+
+	Vec2 orbitTarget = earthTransform.position;
+	orbitTarget.y = orbitTarget.y - _engine->getWindow().getSize().y;
+	auto& orbit = _entityManager.addComponent<Component::Orbit>(entity, &earthTransform.position, dist, 0.01f, (bool)(rand() % 1), angle, false, false);
+	orbit.moving = true;
 }

@@ -31,6 +31,10 @@ void AssetManager::init()
 	addTexture("PopStickEnd", "assets/img/popstick_end.png");
 	createSprite("PopStickEnd", getTexture("PopStickEnd"));
 
+	//UFO
+	addTexture("UFO", "assets/img/ufo.png");
+	createSprite("UFO", getTexture("UFO"), 15, 14, 200, 1);
+
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
 	addShader("String", "assets/shaders/string.frag", ShaderType::FRAGMENT);
