@@ -1,5 +1,10 @@
 #pragma once
 #include "Scene.h"
+
+enum BossType {
+	MOTHERSHIP
+};
+
 class Scene_Play : public Scene
 {
 protected:
@@ -16,6 +21,7 @@ protected:
 	size_t timeUntilAsteroid = 120;
 	size_t timeUntilGamma = 300;
 	size_t timeUntilUFO = 160;
+	size_t timeUntilBoss = 5 * 60;
 
 	std::vector<Sprite> _asteroidSprites;
 
@@ -26,12 +32,18 @@ protected:
 	bool renderDebug = false;
 	bool alive = true;
 
+	
+	bool isBoss = false;
+	Entity boss;
+	BossType bossType;
+
 	void handleCollisions();
 	void handleMovement(Entity entity);
 	void handleOrbit(Entity entity);
 	void handleAnimations(Entity entity);
 	void handleLifespan(Entity entity);
 	void handleControls(Entity entity);
+	void handleBoss();
 
 public:
 	Scene_Play(GameEngine* engine);
@@ -45,5 +57,6 @@ public:
 	void spawnGammaWarning();
 	void spawnGamma(Vec2 dir);
 	void spawnUFO();
+	void spawnBoss();
+	void spawnBossWarning();
 };
-

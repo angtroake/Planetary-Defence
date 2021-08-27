@@ -153,26 +153,39 @@ void Scene_Play::tick()
 		_entityManager.getComponent<Component::Input>(satellite).canShoot = true;
 		_entityManager.getComponent<Component::Material>(satellite).sprite = _engine->getAssets().getSprite("SatelliteReady");
 	}
-
-	timeUntilAsteroid--;
-	if (timeUntilAsteroid <= 0) 
+	if (isBoss) 
 	{
-		spawnAsteroid();
-		timeUntilAsteroid = rand() % 600;
+		handleBoss();
 	}
-
-	timeUntilGamma--;
-	if (timeUntilGamma <= 0) 
+	else
 	{
-		spawnGammaWarning();
-		timeUntilGamma = 20 + rand() % (60 * 30);
-	}
+		timeUntilAsteroid--;
+		if (timeUntilAsteroid <= 0)
+		{
+			//spawnAsteroid();
+			timeUntilAsteroid =  2 * 60 + rand() % 600;
+		}
 
-	timeUntilUFO--;
-	if (timeUntilUFO <= 0) 
-	{
-		spawnUFO();
-		timeUntilUFO = rand() % 600;
+		timeUntilGamma--;
+		if (timeUntilGamma <= 0)
+		{
+			//spawnGammaWarning();
+			timeUntilGamma = 120 + rand() % (60 * 20);
+		}
+
+		timeUntilUFO--;
+		if (timeUntilUFO <= 0)
+		{
+			//spawnUFO();
+			timeUntilUFO = 2 * 60 + rand() % 600;
+		}
+
+		timeUntilBoss--;
+		if (timeUntilBoss <= 0) 
+		{
+			spawnBossWarning();
+			//TODO set boss time
+		}
 	}
 
 
@@ -194,7 +207,7 @@ void Scene_Play::tick()
 	if (_entityManager.getComponent<Component::Health>(earth).health <= 0)
 	{
 		alive = false;
-		//_engine->changeScene(std::make_shared<Scene_Gameover>(_engine), "GAME_OVER", true);
+		_engine->changeScene(std::make_shared<Scene_Gameover>(_engine), "GAME_OVER", true);
 	}
 
 }
@@ -484,6 +497,10 @@ void Scene_Play::handleLifespan(Entity entity)
 				Vec2 dir = earthTransform.position - warningTransform.position;
 				spawnGamma(dir / dir.mag());
 			}
+			else if (_entityManager.getTag(entity) == "BossWarning") 
+			{
+				spawnBoss();
+			}
 
 			_entityManager.destroyEntity(entity);
 		}
@@ -586,6 +603,15 @@ void Scene_Play::onKeyAction(std::string actionName, KeyAction action)
 	}
 }
 
+
+void Scene_Play::handleBoss()
+{
+	if (bossType == BossType::MOTHERSHIP) 
+	{
+		std::cout << _entityManager.getComponent<Component::Transform>(boss).position.x <<"," << _entityManager.getComponent<Component::Transform>(boss).position.y << std::endl;
+	}
+}
+
 void Scene_Play::spawnAsteroid()
 {
 	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
@@ -678,6 +704,61 @@ void Scene_Play::spawnUFO()
 
 	Vec2 orbitTarget = earthTransform.position;
 	orbitTarget.y = orbitTarget.y - _engine->getWindow().getSize().y;
-	auto& orbit = _entityManager.addComponent<Component::Orbit>(entity, &earthTransform.position, dist, 0.01f, (bool)(rand() % 1), angle, false, false);
+	auto& orbit = _entityManager.addComponent<Component::Orbit>(entity, &earthTransform.position, dist, 0.01f, (bool)(rand() % 2), angle, false, false);
 	orbit.moving = true;
+}
+
+void Scene_Play::spawnBoss() 
+{
+	if (bossType == BossType::MOTHERSHIP) 
+	{
+		auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+		
+		float dist = 500;
+		float angle = (rand() % 2) == 0 ? PI / 2.0f : 3.0f * PI / 2.0f;
+		Vec2 pos(dist * sin(angle), dist * cos(angle));
+		pos = earthTransform.position + pos;
+
+		size_t ropeSegs = 20;
+		float segDist = (_engine->getWindow().getSize().y) / ropeSegs;
+
+		float startAngle = (angle == PI/2.0f ? -PI/2.0f:PI/2.0f);
+		Vec2 ropeVec = (pos - Vec2(pos.x, pos.y - segDist * ropeSegs));
+		Vec2 startPos = Vec2(pos.x, pos.y - segDist * ropeSegs) + Vec2(ropeVec.x * cos(startAngle) - ropeVec.y * sin(startAngle), ropeVec.x * sin(startAngle) + ropeVec.y * cos(startAngle)) * 0.9f;
+
+		boss = _entityManager.createEntity("Boss");
+		auto& transform = _entityManager.addComponent<Component::Transform>(boss, startPos, Vec2(0, 0), Vec2(1, 1), true);
+		_entityManager.addComponent<Component::Material>(boss, _engine->getAssets().getSprite("Mothership"), true);
+		_entityManager.addComponent<Component::Health>(boss, 50);
+		_entityManager.addComponent<Component::Rope>(boss, ropeSegs, segDist, Vec2(pos.x, pos.y - segDist * ropeSegs), &transform.position, &transform.direction, Vec2(0, 0), true);
+		auto& orbit = _entityManager.addComponent<Component::Orbit>(boss, &earthTransform.position, dist, 0.001f, (bool)(rand() % 2), angle, false, false);
+		orbit.moving = true;
+
+		std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 120);
+		ani->init(boss, _entityManager);
+		_entityManager.addComponent<Component::CAnimation>(boss, ani);
+
+
+		isBoss = true;
+	}
+}
+
+void Scene_Play::spawnBossWarning()
+{
+	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+
+	size_t bossSelection = rand() % 1;
+
+	auto warning = _entityManager.createEntity("BossWarning");
+	_entityManager.addComponent<Component::Transform>(warning, Vec2(_engine->getWindowSize().x / 2, _engine->getWindowSize().y / 2), Vec2(0, 0), Vec2(1, 1), false);
+	_entityManager.addComponent<Component::Material>(warning, _engine->getAssets().getSprite("MothershipWarning"), true);
+	_entityManager.addComponent<Component::Lifespan>(warning, 60 * 3);
+	_entityManager.addComponent<Component::Lifespan>(warning, 5 * 60);
+	std::shared_ptr<AnimationBlink> ani = std::make_shared<AnimationBlink>(_engine, 60, 5 * 60);
+	_entityManager.addComponent<Component::CAnimation>(warning, ani);
+
+	if (bossSelection == 0) 
+	{
+		bossType = BossType::MOTHERSHIP;
+	}
 }

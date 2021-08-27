@@ -64,7 +64,10 @@ namespace Component {
 		Orbit() {}
 		Orbit(Vec2* target, float distance, float speed, bool cw, float startAngle, bool transformDirection, bool stickToDistance) 
 			: target(target), distance(distance), speed(speed), clockWise(cw), currentAngle(startAngle), transformDirection(transformDirection), stickToDistance(stickToDistance){}
+		Orbit(Vec2 target, float distance, float speed, bool cw, float startAngle, bool transformDirection, bool stickToDistance)
+			:_target(target), target(&_target), distance(distance), speed(speed), clockWise(cw), currentAngle(startAngle), transformDirection(transformDirection), stickToDistance(stickToDistance) {}
 
+		Vec2 _target;
 		Vec2* target;
 		float distance;
 		float speed;

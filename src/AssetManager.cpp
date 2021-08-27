@@ -35,6 +35,12 @@ void AssetManager::init()
 	addTexture("UFO", "assets/img/ufo.png");
 	createSprite("UFO", getTexture("UFO"), 15, 14, 200, 1);
 
+	//Mothership
+	addTexture("MothershipWarning", "assets/img/mothership_warning.png");
+	createSprite("MothershipWarning", getTexture("MothershipWarning"));
+	addTexture("Mothership", "assets/img/mothership.png");
+	createSprite("Mothership", getTexture("Mothership"), 15, 14, 200, 2);
+
 	//Laser
 	addTexture("Laser", "assets/img/laser_short.png");
 	createSprite("Laser", getTexture("Laser"));
