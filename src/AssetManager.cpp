@@ -72,6 +72,12 @@ void AssetManager::init()
 	addSound("BossWarning", "assets/sounds/boss_warning.wav");
 	addSound("GammaWarning", "assets/sounds/gamma_warning.ogg");
 
+	//Particles
+	addTexture("BlueExplosion", "assets/img/blue_explosion.png");
+	createSprite("BlueExplosion", getTexture("BlueExplosion"), 5, 5, 24, 2);
+	addTexture("ShieldHit", "assets/img/shield_hit.png");
+	createSprite("ShieldHit", getTexture("ShieldHit"), 1, 8, 8, 2);
+
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
 	//addShader("String", "assets/shaders/string.frag", ShaderType::FRAGMENT);

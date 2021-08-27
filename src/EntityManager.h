@@ -8,7 +8,7 @@
 
 
 //Max amount of entities allowed in a scene.
-const Entity MAX_ENTITIES = 1000;
+const Entity MAX_ENTITIES = 10000;
 
 
 //Tuple containing all possible components

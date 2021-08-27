@@ -161,6 +161,7 @@ void Scene_Play::tick()
 	}
 	else if (isBossWarning) 
 	{
+		currentMusic->stop();
 		if (musicFade > 0) 
 		{
 			musicFade -= 0.05f;
@@ -184,7 +185,7 @@ void Scene_Play::tick()
 		timeUntilGamma--;
 		if (timeUntilGamma <= 0)
 		{
-			spawnGammaWarning();
+			//spawnGammaWarning();
 			timeUntilGamma = 120 + rand() % (60 * 20);
 		}
 
@@ -323,6 +324,17 @@ void Scene_Play::handleCollisions()
 		if (Physics::isColliding(_entityManager, entity, shield))
 		{
 			_entityManager.destroyEntity(entity);
+
+			auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+
+			//Particle
+			Vec2 dir = earthTransform.position - transform.position;
+			dir = dir / dir.mag();
+
+			auto p = _entityManager.createEntity("Particle");
+			_entityManager.addComponent<Component::Transform>(p, transform.position + dir * 32, Vec2(0,0), Vec2(0.5, 0.5), false);
+			_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("BlueExplosion"), false);
 		}
 	}
 
@@ -331,17 +343,30 @@ void Scene_Play::handleCollisions()
 		auto& mat = _entityManager.getComponent<Component::Material>(entity);
 		auto& transform = _entityManager.getComponent<Component::Transform>(entity);
 		auto& shieldTransform = _entityManager.getComponent<Component::Transform>(shield);
+		auto& shieldMat = _entityManager.getComponent<Component::Material>(shield);
 
 		if (Physics::isColliding(_entityManager, entity, shield) && abs(((int)(abs(transform.direction.angle(shieldTransform.direction)) * 180.0f / PI) % 360) - 180) < 90)
 		{
-			
+
 			mat.crop.top += transform.velocity.mag() / 6.0f;
 			mat.crop.height -= transform.velocity.mag() / 6.0f;
 			transform.position = transform.position - transform.velocity;
-			if (mat.crop.height <= 0) 
+			if (mat.crop.height <= 0)
 			{
 				mat.crop.height = 0;
 				_entityManager.destroyEntity(entity);
+			}
+
+			//Shield Particle
+			if (_entityManager.getEntities("ParticleShieldHit").size() <= 10){
+				float y = shieldMat.sprite.getSize().y / 2.0f * shieldTransform.scale.y;
+				float angle = Vec2(0, -1).angle(shieldTransform.direction);
+				Vec2 pos = shieldTransform.position - Vec2(-y * sin(angle), y * cos(angle));
+
+				auto p = _entityManager.createEntity("ParticleShieldHit");
+				auto& t = _entityManager.addComponent<Component::Transform>(p, pos, Vec2(0, 0), Vec2(1, 0.7), true);
+				t.direction = shieldTransform.direction;
+				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("ShieldHit"), false);
 			}
 		} 
 		else if (Physics::isColliding(_entityManager, entity, earth))
@@ -356,6 +381,18 @@ void Scene_Play::handleCollisions()
 		if (Physics::isColliding(_entityManager, entity, shield))
 		{
 			_entityManager.destroyEntity(entity);
+
+			auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+			auto& mat = _entityManager.getComponent<Component::Material>(entity);
+
+			//Particle
+			Vec2 dir = earthTransform.position - transform.position;
+			dir = dir / dir.mag();
+
+			auto p = _entityManager.createEntity("Particle");
+			_entityManager.addComponent<Component::Transform>(p, transform.position + dir * mat.sprite.getSize().y * transform.scale.y, Vec2(0, 0), Vec2(0.5, 0.5), false);
+			_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("BlueExplosion"), false);
 		}
 		else if (Physics::isColliding(_entityManager, entity, earth)) 
 		{
@@ -412,7 +449,7 @@ void Scene_Play::handleMovement(Entity entity)
 			transform.prevPosition = transform.position;
 			transform.position = transform.position + transform.velocity;
 
-			if (!_entityManager.hasComponent<Component::Orbit>(entity)) {
+			if (!_entityManager.hasComponent<Component::Orbit>(entity) && transform.velocity.mag() != 0) {
 				transform.direction = transform.velocity / transform.velocity.mag();
 			}
 		}
@@ -678,6 +715,17 @@ void Scene_Play::handleBoss()
 
 				mat.crop.top = crop;
 				transform.position = pos + a * crop;
+
+				if (_entityManager.getEntities("ParticleMothershipBlock").size() < 10) {
+					//Particle
+					Vec2 dir = mothershipTransform.position - earthTransform.position;
+					dir = dir / dir.mag();
+					Vec2 pos = earthTransform.position + dir * (shieldTransform.position - earthTransform.position).mag();
+
+					auto p = _entityManager.createEntity("ParticleMothershipBlock");
+					_entityManager.addComponent<Component::Transform>(p, pos, Vec2(0, 0), Vec2(0.8, 0.8), false);
+					_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("BlueExplosion"), false);
+				}
 			}
 			else 
 			{

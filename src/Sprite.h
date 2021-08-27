@@ -4,9 +4,9 @@ class Sprite
 {
 protected:
 	sf::Sprite _sprite;
-	uint32_t _frame;
-	uint32_t _frameCount;
-	uint16_t _speed;
+	size_t _frame = 0;
+	size_t _frameCount;
+	size_t _speed;
 	sf::Vector2u _textureSize;
 	size_t _sheetX;
 	size_t _sheetY;

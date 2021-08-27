@@ -42,13 +42,18 @@ void Scene::renderEntity(const int & entity, bool debug, std::string renderOnly)
 		frame.width = mat.crop.width;
 		frame.height = mat.crop.height;
 
+		if (_entityManager.getTag(entity) == "ParticleShieldHit") 
+		{
+			float a = 0;
+		}
+
 		mat.sprite.get().setTextureRect(frame);
 
 		if (_entityManager.hasComponent<Component::Invincibility>(entity))
 		{
 			mat.sprite.get().setColor(sf::Color(255, 255, 255, 100));
 		}
-		else 
+		else if(!_entityManager.hasComponent<Component::CAnimation>(entity))
 		{
 			mat.sprite.get().setColor(sf::Color(255, 255, 255, 255));
 		}

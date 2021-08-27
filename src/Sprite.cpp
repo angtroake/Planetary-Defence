@@ -1,7 +1,7 @@
 #include "Sprite.h"
 
 Sprite::Sprite(const sf::Texture& texture, size_t sheetX, size_t sheetY, uint32_t frameCount, uint16_t speed)
-	:_frameCount(frameCount), _speed(speed), _sheetX(sheetX), _sheetY(sheetY)
+	:_frameCount(frameCount), _speed(speed), _sheetX(sheetX), _sheetY(sheetY), _frame(0)
 {
 	_sprite = sf::Sprite(texture);
 	_textureSize = texture.getSize();
@@ -31,7 +31,7 @@ sf::IntRect Sprite::getCurrentFrame()
 
 const bool Sprite::ended() const
 {
-	return _frame >= _frameCount * _speed;
+	return _frame >= (_frameCount * _speed);
 }
 
 const Vec2 Sprite::getSize() const
