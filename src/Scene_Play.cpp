@@ -185,7 +185,7 @@ void Scene_Play::tick()
 		timeUntilGamma--;
 		if (timeUntilGamma <= 0)
 		{
-			//spawnGammaWarning();
+			spawnGammaWarning();
 			timeUntilGamma = 120 + rand() % (60 * 20);
 		}
 
