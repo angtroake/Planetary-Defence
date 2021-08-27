@@ -21,19 +21,21 @@ protected:
 	size_t timeUntilAsteroid = 120;
 	size_t timeUntilGamma = 300;
 	size_t timeUntilUFO = 160;
-	size_t timeUntilBoss = 5 * 60;
+	size_t timeUntilBoss;
 
 	std::vector<Sprite> _asteroidSprites;
 
 	sf::Sound* currentMusic = nullptr;
 	const size_t musicTrackCount = 2;
 	size_t currentMusicTrack;
+	float musicFade = 1.0f;
 
 	bool renderDebug = false;
 	bool alive = true;
 
 	
 	bool isBoss = false;
+	bool isBossWarning = false;
 	Entity boss;
 	BossType bossType;
 

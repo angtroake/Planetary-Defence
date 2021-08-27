@@ -62,6 +62,8 @@ void Scene_Play::init()
 	currentMusicTrack = rand() % musicTrackCount;
 	currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
 	currentMusic->play();
+
+	timeUntilBoss = 30 * 60;
 }
 
 void Scene_Play::tick()
@@ -157,26 +159,39 @@ void Scene_Play::tick()
 	{
 		handleBoss();
 	}
+	else if (isBossWarning) 
+	{
+		if (musicFade > 0) 
+		{
+			musicFade -= 0.05f;
+			currentMusic->setVolume(DEFAULT_AUDIO_VOLUME * musicFade);
+		}
+		else 
+		{
+			currentMusic->stop();
+			currentMusic->setVolume(DEFAULT_AUDIO_VOLUME);
+		}
+	}
 	else
 	{
 		timeUntilAsteroid--;
 		if (timeUntilAsteroid <= 0)
 		{
-			//spawnAsteroid();
+			spawnAsteroid();
 			timeUntilAsteroid =  2 * 60 + rand() % 600;
 		}
 
 		timeUntilGamma--;
 		if (timeUntilGamma <= 0)
 		{
-			//spawnGammaWarning();
+			spawnGammaWarning();
 			timeUntilGamma = 120 + rand() % (60 * 20);
 		}
 
 		timeUntilUFO--;
 		if (timeUntilUFO <= 0)
 		{
-			//spawnUFO();
+			spawnUFO();
 			timeUntilUFO = 2 * 60 + rand() % 600;
 		}
 
@@ -184,7 +199,7 @@ void Scene_Play::tick()
 		if (timeUntilBoss <= 0) 
 		{
 			spawnBossWarning();
-			//TODO set boss time
+			timeUntilBoss = 30 * 60;
 		}
 	}
 
@@ -241,6 +256,14 @@ void Scene_Play::render()
 			renderEntity(entity, renderDebug, "BoundingBox");
 			renderEntity(entity, renderDebug, "CAnimation");
 		}
+	}
+
+	if (isBoss) 
+	{
+		renderEntity(boss, renderDebug, "Rope");
+		renderEntity(boss, renderDebug, "Material");
+		renderEntity(boss, renderDebug, "BoundingBox");
+		renderEntity(boss, renderDebug, "CAnimation");
 	}
 
 	renderHealth();
@@ -359,6 +382,16 @@ void Scene_Play::handleCollisions()
 			{
 				_entityManager.destroyEntity(entity);
 				_entityManager.destroyEntity(enemy);
+			}
+		}
+
+		if (isBoss) 
+		{
+			if (Physics::isColliding(_entityManager, entity, boss)) 
+			{
+				_entityManager.destroyEntity(entity);
+				_entityManager.getComponent<Component::Health>(boss).damage(1);
+				_entityManager.addComponent<Component::Invincibility>(boss, 10);
 			}
 		}
 	}
@@ -505,6 +538,17 @@ void Scene_Play::handleLifespan(Entity entity)
 			_entityManager.destroyEntity(entity);
 		}
 	}
+
+	//Invincibility
+	if (_entityManager.hasComponent<Component::Invincibility>(entity))
+	{
+		auto& inv = _entityManager.getComponent<Component::Invincibility>(entity);
+		inv.frames--;
+		if (inv.frames == 0) 
+		{
+			_entityManager.removeComponent<Component::Invincibility>(entity);
+		}
+	}
 }
 
 void Scene_Play::handleAnimations(Entity entity)
@@ -608,7 +652,51 @@ void Scene_Play::handleBoss()
 {
 	if (bossType == BossType::MOTHERSHIP) 
 	{
-		std::cout << _entityManager.getComponent<Component::Transform>(boss).position.x <<"," << _entityManager.getComponent<Component::Transform>(boss).position.y << std::endl;
+		auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+		auto& mothershipTransform = _entityManager.getComponent<Component::Transform>(boss);
+		auto& shieldTransform = _entityManager.getComponent<Component::Transform>(shield);
+
+		for (Entity entity : _entityManager.getEntities("MothershipLaser")) 
+		{
+			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+			auto& mat = _entityManager.getComponent<Component::Material>(entity);
+
+			transform.position = mothershipTransform.position + (earthTransform.position - mothershipTransform.position) / 2.0f;
+			transform.direction = (earthTransform.position - mothershipTransform.position) / (earthTransform.position - mothershipTransform.position).mag();
+
+			if (Physics::isColliding(_entityManager, entity, shield) && abs(((int)(abs(transform.direction.angle(shieldTransform.direction)) * 180.0f / PI) % 360) - 180) < 90)
+			{	
+				Vec2 pos = mothershipTransform.position + (earthTransform.position - mothershipTransform.position) / 2.0f;
+
+				float spriteSize = mat.sprite.getSize().y;
+
+				//float crop = spriteSize / 2.0f - pos.dist(shieldTransform.position);
+				float crop = shieldTransform.position.dist(earthTransform.position);
+
+				Vec2 a = mothershipTransform.position - earthTransform.position;
+				a = a / a.mag();
+
+				mat.crop.top = crop;
+				transform.position = pos + a * crop;
+			}
+			else 
+			{
+				_entityManager.getComponent<Component::Health>(earth).damage(0.05f);
+				mat.crop.top = 0;
+				transform.position = mothershipTransform.position + (earthTransform.position - mothershipTransform.position) / 2.0f;
+			}
+		}
+	}
+
+	if (_entityManager.getComponent<Component::Health>(boss).health <= 0) 
+	{
+		_entityManager.destroyEntity(boss);
+		isBoss = false;
+
+		currentMusic->stop();
+		currentMusicTrack = (currentMusicTrack + 1) % musicTrackCount;
+		currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
+		currentMusic->play();
 	}
 }
 
@@ -653,6 +741,8 @@ void Scene_Play::spawnGammaWarning()
 	_entityManager.addComponent<Component::Lifespan>(warning, 5 * 60);
 	std::shared_ptr<AnimationBlink> ani = std::make_shared<AnimationBlink>(_engine, 60, 5 * 60);
 	_entityManager.addComponent<Component::CAnimation>(warning, ani);
+
+	_engine->getAssets().getSound("GammaWarning").play();
 }
 
 void Scene_Play::spawnGamma(Vec2 dir) 
@@ -689,7 +779,7 @@ void Scene_Play::spawnUFO()
 	auto& transform = _entityManager.addComponent<Component::Transform>(entity, Vec2(pos.x + 10, -100), Vec2(0,0), Vec2(1, 1), true);
 	_entityManager.addComponent<Component::Health>(entity, 1);
 	auto& mat = _entityManager.addComponent<Component::Material>(entity, _engine->getAssets().getSprite("UFO"), true);
-	_entityManager.addComponent<Component::BoundingBox>(entity, (mat.sprite.getSize() * 0.4f));
+	_entityManager.addComponent<Component::BoundingBox>(entity, (mat.sprite.getSize() * 0.6f));
 
 	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 120);
 	ani->init(entity, _entityManager);
@@ -728,9 +818,10 @@ void Scene_Play::spawnBoss()
 
 		boss = _entityManager.createEntity("Boss");
 		auto& transform = _entityManager.addComponent<Component::Transform>(boss, startPos, Vec2(0, 0), Vec2(1, 1), true);
-		_entityManager.addComponent<Component::Material>(boss, _engine->getAssets().getSprite("Mothership"), true);
+		auto& mat = _entityManager.addComponent<Component::Material>(boss, _engine->getAssets().getSprite("Mothership"), true);
 		_entityManager.addComponent<Component::Health>(boss, 50);
 		_entityManager.addComponent<Component::Rope>(boss, ropeSegs, segDist, Vec2(pos.x, pos.y - segDist * ropeSegs), &transform.position, &transform.direction, Vec2(0, 0), true);
+		_entityManager.addComponent<Component::BoundingBox>(boss, mat.sprite.getSize() * 0.8);
 		auto& orbit = _entityManager.addComponent<Component::Orbit>(boss, &earthTransform.position, dist, 0.001f, (bool)(rand() % 2), angle, false, false);
 		orbit.moving = true;
 
@@ -738,9 +829,18 @@ void Scene_Play::spawnBoss()
 		ani->init(boss, _entityManager);
 		_entityManager.addComponent<Component::CAnimation>(boss, ani);
 
-
-		isBoss = true;
+		std::shared_ptr<AIMothership> ai = std::make_shared<AIMothership>(boss, &earthTransform.position, &_entityManager);
+		_entityManager.addComponent<Component::CAI>(boss, ai);
 	}
+
+	currentMusic->stop();
+	size_t bossMusicTrack = rand() % 3;
+	currentMusic = &_engine->getAssets().getSound("BossMusic" + std::to_string(bossMusicTrack));
+	currentMusic->play();
+
+	musicFade = 1.0f;
+	isBoss = true;
+	isBossWarning = false;
 }
 
 void Scene_Play::spawnBossWarning()
@@ -761,4 +861,7 @@ void Scene_Play::spawnBossWarning()
 	{
 		bossType = BossType::MOTHERSHIP;
 	}
+
+	_engine->getAssets().getSound("BossWarning").play();
+	isBossWarning = true;
 }

@@ -17,6 +17,8 @@ const float MAXFALL = 20;
 
 const bool DEBUG = true;
 
+const float DEFAULT_AUDIO_VOLUME = 10;
+
 typedef uint32_t Entity;
 
 namespace Util

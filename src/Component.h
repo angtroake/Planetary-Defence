@@ -49,12 +49,12 @@ namespace Component {
 	{
 	public:
 		Health() {}
-		Health(size_t maxHealth): health(maxHealth), maxHealth(maxHealth) {}
+		Health(float maxHealth): health(maxHealth), maxHealth(maxHealth) {}
 		
-		void damage(size_t amount) { health -= amount; }
+		void damage(float amount) { health -= amount; }
 
-		int health;
-		size_t maxHealth;
+		float health;
+		float maxHealth;
 
 	};
 
@@ -179,6 +179,15 @@ namespace Component {
 		CAI(std::shared_ptr<AI> ai): ai(ai) {}
 		
 		std::shared_ptr<AI> ai;
+	};
+
+	class Invincibility : public Component 
+	{
+	public:
+		Invincibility() {}
+		Invincibility(size_t frames): frames(frames) {}
+
+		size_t frames;
 	};
 }
 

@@ -40,6 +40,10 @@ void AssetManager::init()
 	createSprite("MothershipWarning", getTexture("MothershipWarning"));
 	addTexture("Mothership", "assets/img/mothership.png");
 	createSprite("Mothership", getTexture("Mothership"), 15, 14, 200, 2);
+	addSound("MothershipCharge", "assets/sounds/mothership_charge.ogg");
+	getSound("MothershipCharge").setVolume(50);
+	addSound("MothershipShoot", "assets/sounds/mothership_shoot.wav");
+
 
 	//Laser
 	addTexture("Laser", "assets/img/laser_short.png");
@@ -55,14 +59,18 @@ void AssetManager::init()
 	addSound("MusicMenu", "assets/music/Cyberspace.ogg");
 	addSound("MusicPlay0", "assets/music/Dungeon1.ogg");
 	addSound("MusicPlay1", "assets/music/Dungeon2.ogg");
+	addSound("BossMusic0", "assets/music/Battle1.ogg");
+	addSound("BossMusic1", "assets/music/Battle2.ogg");
+	addSound("BossMusic2", "assets/music/Battle3.ogg");
 
 	//Sounds
 	addSound("Laser1", "assets/sounds/laser1.wav");
 	addSound("Laser2", "assets/sounds/laser2.wav");
 	addSound("Laser3", "assets/sounds/laser3.wav");
 	addSound("Laser4", "assets/sounds/laser4.wav");
-
 	addSound("SatelliteReady", "assets/sounds/satellite_ready.wav");
+	addSound("BossWarning", "assets/sounds/boss_warning.wav");
+	addSound("GammaWarning", "assets/sounds/gamma_warning.ogg");
 
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);
@@ -150,7 +158,7 @@ void AssetManager::addSound(const std::string& name, const std::string path)
 	{
 		_soundBuffers[name] = sound;
 		_sounds[name] = sf::Sound(_soundBuffers[name]);
-		_sounds[name].setVolume(20);
+		_sounds[name].setVolume(DEFAULT_AUDIO_VOLUME);
 	}
 
 }

@@ -44,6 +44,15 @@ void Scene::renderEntity(const int & entity, bool debug, std::string renderOnly)
 
 		mat.sprite.get().setTextureRect(frame);
 
+		if (_entityManager.hasComponent<Component::Invincibility>(entity))
+		{
+			mat.sprite.get().setColor(sf::Color(255, 255, 255, 100));
+		}
+		else 
+		{
+			mat.sprite.get().setColor(sf::Color(255, 255, 255, 255));
+		}
+
 		if (transfrom.rotates) 
 		{
 			mat.sprite.get().setRotation(Vec2(0, -1).angle(transfrom.direction) * 180.0f / PI);
@@ -58,7 +67,32 @@ void Scene::renderEntity(const int & entity, bool debug, std::string renderOnly)
 			_engine->getWindow().draw(mat.sprite.get());
 		}
 	}
+	/*
+	if (_entityManager.hasComponent<Component::Invincibility>(entity) && (renderOnly == "ALL" || renderOnly == "Invincibility")) 
+	{
+		auto& mat = _entityManager.getComponent<Component::Material>(entity);
+		auto& transfrom = _entityManager.getComponent<Component::Transform>(entity);
 
+		mat.sprite.get().setOrigin((mat.sprite.getSize().x) / 2, (mat.sprite.getSize().y) / 2);
+		mat.sprite.get().setPosition(transfrom.position.x, transfrom.position.y);
+		mat.sprite.get().setScale({ transfrom.scale.x, transfrom.scale.y });
+
+		sf::IntRect frame = mat.sprite.getCurrentFrame();
+		frame.top += mat.crop.top;
+		frame.left += mat.crop.left;
+		frame.width = mat.crop.width;
+		frame.height = mat.crop.height;
+
+		mat.sprite.get().setTextureRect(frame);
+
+		if (transfrom.rotates)
+		{
+			mat.sprite.get().setRotation(Vec2(0, -1).angle(transfrom.direction) * 180.0f / PI);
+		}
+
+		_engine->getWindow().draw(mat.sprite.get());
+	}
+	*/
 	if (debug && _entityManager.hasComponent<Component::BoundingBox>(entity) && (renderOnly == "ALL" || renderOnly == "BoundingBox"))
 	{
 		auto& boundingbox = _entityManager.getComponent<Component::BoundingBox>(entity);

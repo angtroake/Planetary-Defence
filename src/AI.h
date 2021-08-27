@@ -23,3 +23,20 @@ protected:
 public:
 	AIUFO(Vec2* position, Vec2* target, EntityManager* entityManager);
 };
+
+class AIMothership : public AI 
+{
+protected:
+	void tick(GameEngine* engine);
+	int timeToShoot;
+	int timeToSpawn;
+	int shootCooldown;
+	bool isShooting = false;
+	EntityManager* entityManager;
+	Vec2* target;
+	Entity mothership;
+public:
+	AIMothership(Entity mothership, Vec2* target, EntityManager* entityManager);
+	int randTimeToShoot();
+	int randTimeToSpawn();
+};
