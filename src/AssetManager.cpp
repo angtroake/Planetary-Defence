@@ -62,6 +62,8 @@ void AssetManager::init()
 	addSound("BossMusic0", "assets/music/Battle1.ogg");
 	addSound("BossMusic1", "assets/music/Battle2.ogg");
 	addSound("BossMusic2", "assets/music/Battle3.ogg");
+	addSound("BossWin", "assets/music/Victory.ogg");
+	addSound("GameOver", "assets/music/GameOver.ogg");
 
 	//Sounds
 	addSound("Laser1", "assets/sounds/laser1.wav");
@@ -77,6 +79,8 @@ void AssetManager::init()
 	createSprite("BlueExplosion", getTexture("BlueExplosion"), 5, 5, 24, 2);
 	addTexture("ShieldHit", "assets/img/shield_hit.png");
 	createSprite("ShieldHit", getTexture("ShieldHit"), 1, 8, 8, 2);
+	addTexture("Explosion", "assets/img/Explosion.png");
+	createSprite("Explosion", getTexture("Explosion"), 12, 1, 12, 1);
 
 	//addShader("Atmosphere", "assets/shaders/atmosphere.frag", ShaderType::FRAGMENT);
 	//getShader("Atmosphere")->setUniform("iResolution", sf::Vector2f{ 256, 256}*8.0f);

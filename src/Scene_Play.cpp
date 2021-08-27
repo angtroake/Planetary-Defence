@@ -315,15 +315,42 @@ void Scene_Play::handleCollisions()
 		//If asteroid is dropping down don't do collisions
 		if (_entityManager.hasComponent<Component::CAnimation>(entity)) { continue; }
 
+		//If already destroyed skip
+		if (!_entityManager.hasComponent<Component::Material>(entity)) { continue; }
+
 		if (Physics::isColliding(_entityManager, entity, earth))
 		{
-			_entityManager.destroyEntity(entity);
+			//_entityManager.destroyEntity(entity);
+
+			_entityManager.removeComponent<Component::Material>(entity);
+			_entityManager.addComponent<Component::Lifespan>(entity, 5 * 60);
+			_entityManager.removeComponent<Component::BoundingBox>(entity);
+			auto& t = _entityManager.getComponent<Component::Transform>(entity);
+			t.velocity.y = -5;
+
+			auto p = _entityManager.createEntity("Particle");
+			_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(1, 1), false);
+			_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
+
 			_entityManager.getComponent<Component::Health>(earth).damage(1);
 		}
 
 		if (Physics::isColliding(_entityManager, entity, shield))
-		{
-			_entityManager.destroyEntity(entity);
+		{	
+			//_entityManager.destroyEntity(entity);
+
+			//Asteroid Remove Animation
+			_entityManager.removeComponent<Component::Material>(entity);
+			_entityManager.addComponent<Component::Lifespan>(entity, 5 * 60);
+			_entityManager.removeComponent<Component::BoundingBox>(entity);
+			auto& t = _entityManager.getComponent<Component::Transform>(entity);
+			t.velocity.y = -5;
+
+			//Asteroid Explosion
+			Entity p = _entityManager.createEntity("Particle");
+			_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(1, 1), false);
+			_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
+
 
 			auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
 			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
@@ -332,9 +359,9 @@ void Scene_Play::handleCollisions()
 			Vec2 dir = earthTransform.position - transform.position;
 			dir = dir / dir.mag();
 
-			auto p = _entityManager.createEntity("Particle");
-			_entityManager.addComponent<Component::Transform>(p, transform.position + dir * 32, Vec2(0,0), Vec2(0.5, 0.5), false);
-			_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("BlueExplosion"), false);
+			auto part = _entityManager.createEntity("Particle");
+			_entityManager.addComponent<Component::Transform>(part, transform.position + dir * 32, Vec2(0,0), Vec2(0.5, 0.5), false);
+			_entityManager.addComponent<Component::Material>(part, _engine->getAssets().getSprite("BlueExplosion"), false);
 		}
 	}
 
@@ -409,7 +436,17 @@ void Scene_Play::handleCollisions()
 			if (Physics::isColliding(_entityManager, entity, enemy))
 			{
 				_entityManager.destroyEntity(entity);
-				_entityManager.destroyEntity(enemy);
+				//_entityManager.destroyEntity(enemy);
+
+				_entityManager.removeComponent<Component::Material>(enemy);
+				_entityManager.addComponent<Component::Lifespan>(enemy, 5 * 60);
+				_entityManager.removeComponent<Component::BoundingBox>(enemy);
+				auto& t = _entityManager.getComponent<Component::Transform>(enemy);
+				t.velocity.y = -5;
+
+				Entity p = _entityManager.createEntity("Particle");
+				_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(1, 1), false);
+				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
 			}
 		}
 		
@@ -418,7 +455,19 @@ void Scene_Play::handleCollisions()
 			if (Physics::isColliding(_entityManager, entity, enemy))
 			{
 				_entityManager.destroyEntity(entity);
-				_entityManager.destroyEntity(enemy);
+				//_entityManager.destroyEntity(enemy);
+
+				_entityManager.removeComponent<Component::Material>(enemy);
+				_entityManager.addComponent<Component::Lifespan>(enemy, 5 * 60);
+				_entityManager.removeComponent<Component::BoundingBox>(enemy);
+				_entityManager.removeComponent<Component::CAI>(enemy);
+				_entityManager.removeComponent<Component::Orbit>(enemy);
+				auto& t = _entityManager.getComponent<Component::Transform>(enemy);
+				t.velocity.y = -5;
+
+				auto p = _entityManager.createEntity("Particle");
+				_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(1, 1), false);
+				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
 			}
 		}
 
@@ -428,7 +477,13 @@ void Scene_Play::handleCollisions()
 			{
 				_entityManager.destroyEntity(entity);
 				_entityManager.getComponent<Component::Health>(boss).damage(1);
-				_entityManager.addComponent<Component::Invincibility>(boss, 10);
+				//_entityManager.addComponent<Component::Invincibility>(boss, 10);
+
+				auto& t = _entityManager.getComponent<Component::Transform>(entity);
+				auto& m = _entityManager.getComponent<Component::Material>(entity);
+				auto p = _entityManager.createEntity("Particle");
+				_entityManager.addComponent<Component::Transform>(p, t.position + t.direction * m.sprite.getSize().y/2, Vec2(0, 0), Vec2(0.5, 0.5), false);
+				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
 			}
 		}
 	}
@@ -738,13 +793,28 @@ void Scene_Play::handleBoss()
 
 	if (_entityManager.getComponent<Component::Health>(boss).health <= 0) 
 	{
-		_entityManager.destroyEntity(boss);
+		//_entityManager.destroyEntity(boss);
 		isBoss = false;
 
 		currentMusic->stop();
 		currentMusicTrack = (currentMusicTrack + 1) % musicTrackCount;
 		currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
 		currentMusic->play();
+
+
+		//Asteroid Remove Animation
+		_entityManager.removeComponent<Component::Material>(boss);
+		_entityManager.addComponent<Component::Lifespan>(boss, 4 * 60);
+		_entityManager.removeComponent<Component::Orbit>(boss);
+		_entityManager.removeComponent<Component::BoundingBox>(boss);
+		_entityManager.removeComponent<Component::CAI>(boss);
+		auto& t = _entityManager.getComponent<Component::Transform>(boss);
+		t.velocity.y = -5;
+
+		//Asteroid Explosion
+		Entity p = _entityManager.createEntity("Particle");
+		_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(2, 2), false);
+		_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
 	}
 }
 

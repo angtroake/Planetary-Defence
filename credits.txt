@@ -1,2 +1,8 @@
 Earth Model:
 https://opengameart.org/content/low-poly-space-pack
+
+explosion:
+https://opengameart.org/content/pixel-explosion-12-frames
+
+blue explosion:
+https://opengameart.org/content/coloured-particle-explosions
