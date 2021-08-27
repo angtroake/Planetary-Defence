@@ -15,7 +15,7 @@ protected:
 	size_t difficulty = 0;
 	size_t timeAlive = 0;
 	
-	size_t satelliteCooldownMax = 0.5 * 60;
+	size_t satelliteCooldownMax = 0.25 * 60;
 	size_t satelliteCooldown = satelliteCooldownMax;
 
 	size_t timeUntilAsteroid = 120;

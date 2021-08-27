@@ -21,6 +21,12 @@ Vec2 Physics::getOverlap(EntityManager & entityManager, Entity entity1, Entity e
 
 bool Physics::isColliding(EntityManager& entityManager, Entity entity1, Entity entity2) 
 {
+
+    if (!entityManager.hasComponent<Component::BoundingBox>(entity1) || !entityManager.hasComponent<Component::BoundingBox>(entity2)) 
+    {
+        return false;
+    }
+
 	auto& bb1 = entityManager.getComponent<Component::BoundingBox>(entity1);
 	auto& bb2 = entityManager.getComponent<Component::BoundingBox>(entity2);
 

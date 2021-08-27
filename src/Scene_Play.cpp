@@ -47,7 +47,7 @@ void Scene_Play::init()
 	shield = _entityManager.createEntity("Shield");
 	auto & shieldTransform = _entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 0.7), true);
 	_entityManager.addComponent<Component::Material>(shield, _engine->getAssets().getSprite("Shield"), true);
-	_entityManager.addComponent<Component::Orbit>(shield, &earthTransfrom.position, 300, 0.01, true, 0, true, true);
+	_entityManager.addComponent<Component::Orbit>(shield, &earthTransfrom.position, 300, 0.03, true, 0, true, true);
 	_entityManager.addComponent<Component::Input>(shield);
 	_entityManager.addComponent<Component::BoundingBox>(shield, Vec2(250, 50));
 	_entityManager.addComponent<Component::PopsicleStick>(shield, &earthTransfrom.position, &shieldTransform.position, false);
@@ -55,7 +55,7 @@ void Scene_Play::init()
 	satellite = _entityManager.createEntity("Satellite");
 	auto& satelliteTransform = _entityManager.addComponent<Component::Transform>(satellite, Vec2(0, 0), Vec2(0, 0), Vec2(0.4, 0.4), true);
 	_entityManager.addComponent<Component::Material>(satellite, _engine->getAssets().getSprite("SatelliteCharge"), true);
-	_entityManager.addComponent<Component::Orbit>(satellite, &earthTransfrom.position, 225, 0.01, true, 0, true, true);
+	_entityManager.addComponent<Component::Orbit>(satellite, &earthTransfrom.position, 225, 0.03, true, 0, true, true);
 	_entityManager.addComponent<Component::Input>(satellite);
 	_entityManager.addComponent<Component::PopsicleStick>(satellite, &earthTransfrom.position, &satelliteTransform.position, false);
 
@@ -540,7 +540,7 @@ void Scene_Play::handleControls(Entity entity)
 
 				auto bullet = _entityManager.createEntity("SatelliteBullet");
 				auto &mat =_entityManager.addComponent<Component::Material>(bullet, _engine->getAssets().getSprite("Laser"), true);
-				_entityManager.addComponent<Component::Transform>(bullet, transform.position + transform.direction * mat.sprite.getSize().y, transform.direction * 20.0f, Vec2(1,1), true);
+				_entityManager.addComponent<Component::Transform>(bullet, transform.position + transform.direction * mat.sprite.getSize().y, transform.direction * 40.0f, Vec2(1,1), true);
 				_entityManager.addComponent<Component::BoundingBox>(bullet, mat.sprite.getSize());
 				_entityManager.addComponent<Component::Lifespan>(bullet, 3 * 60);
 				
