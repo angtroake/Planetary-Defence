@@ -20,9 +20,9 @@ void GameEngine::init()
 	f.close();
 
 
-	std::vector<sf::VideoMode> videoModes = sf::VideoMode::getFullscreenModes();
-	_window.create(videoModes[0], "GameJam", sf::Style::Fullscreen);
-	//_window.create(sf::VideoMode(1280, 720), "GameJam");
+	//std::vector<sf::VideoMode> videoModes = sf::VideoMode::getFullscreenModes();
+	_window.create(sf::VideoMode(1920, 1080), "GameJam", sf::Style::Fullscreen);
+	//_window.create(sf::VideoMode(1280, 720), "GameJam", sf::Style::Fullscreen);
 	_window.setFramerateLimit(60);
 
 	_assets.init();

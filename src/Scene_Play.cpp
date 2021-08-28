@@ -943,7 +943,7 @@ void Scene_Play::spawnGammaWarning()
 	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
 
 	float angle = (float)(rand() % 360) * PI / 180.0f;
-	Vec2 warningPos(500 * sin(angle), 500 * cos(angle));
+	Vec2 warningPos(400 * sin(angle), 400 * cos(angle));
 	warningPos = warningPos + earthTransform.position;
 
 	auto warning = _entityManager.createEntity("GammaWarning");
