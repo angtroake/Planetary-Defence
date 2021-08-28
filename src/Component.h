@@ -195,8 +195,10 @@ namespace Component {
 	{
 	public:
 		Parent() {}
-		Parent(Entity entity, Vec2* position, Vec2* directon, Vec2* velocity):parent(entity), position(position), directon(directon), velocity(velocity) {}
+		Parent(Entity entity, Vec2* position, Vec2* directon, Vec2* velocity, bool rotateOnVelocity)
+			:parent(entity), position(position), directon(directon), velocity(velocity), rotateOnVelocity(rotateOnVelocity){}
 
+		bool rotateOnVelocity;
 		Entity parent;
 		Vec2* position;
 		Vec2* directon;

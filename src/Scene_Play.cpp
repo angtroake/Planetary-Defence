@@ -47,6 +47,13 @@ void Scene_Play::init()
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
 	handleRope(earth);
 
+
+	earthDamage = _entityManager.createEntity("EarthDamage");
+	_entityManager.addComponent<Component::Transform>(earthDamage, Vec2(_engine->getWindow().getSize().x / 2 + 300, -200), Vec2(0, 0), Vec2(2 * 0.8, 2 * 0.8), true);
+	_entityManager.addComponent<Component::Material>(earthDamage, _engine->getAssets().getSprite("EarthDamage"), true).opacity = 0;
+	_entityManager.addComponent<Component::Parent>(earthDamage, earth, &earthTransfrom.position, &earthTransfrom.direction, &earthTransfrom.velocity, false);
+
+
 	shield = _entityManager.createEntity("Shield");
 	auto & shieldTransform = _entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 0.7), true);
 	_entityManager.addComponent<Component::Material>(shield, _engine->getAssets().getSprite("Shield"), true);
@@ -146,8 +153,15 @@ void Scene_Play::tick()
 			if (_entityManager.isAlive(parent.parent)) 
 			{
 				transform.position = *parent.position;
-				//transform.direction = *parent.directon;
-				transform.direction = *parent.velocity / parent.velocity->mag();
+				if (parent.rotateOnVelocity) 
+				{
+					transform.direction = *parent.velocity / parent.velocity->mag();
+				}
+				else 
+				{
+					transform.direction = *parent.directon;
+				}
+				
 			}
 			else 
 			{
@@ -290,6 +304,7 @@ void Scene_Play::render()
 	renderEntity(earth, renderDebug, "Rope");
 	renderEntity(earth, renderDebug, "Material");
 	renderEntity(earth, renderDebug, "BoundingBox");
+	renderEntity(earthDamage, renderDebug, "Material");
 
 	//Render After Earth
 	for (auto entity : _entityManager.getEntities())
@@ -778,6 +793,15 @@ void Scene_Play::handleAnimations(Entity entity)
 			}
 		}
 	}
+
+	if (entity == earthDamage) 
+	{
+		auto& health = _entityManager.getComponent<Component::Health>(earth);
+		auto& mat = _entityManager.getComponent<Component::Material>(earthDamage);
+		
+		mat.opacity = 255.0f * 1.25f * (1.0f - (health.health / health.maxHealth));
+		if (mat.opacity > 255) { mat.opacity = 255; }
+	}
 }
 
 void Scene_Play::handleRope(Entity entity)
@@ -1061,7 +1085,7 @@ void Scene_Play::spawnAsteroid()
 	auto flame = _entityManager.createEntity("AsteroidFlame");
 	_entityManager.addComponent<Component::Transform>(flame, transform.position, Vec2(0, 0), Vec2(3, 1.8), true);
 	_entityManager.addComponent<Component::Material>(flame, _engine->getAssets().getSprite("Fireball"), true).opacity = 0;
-	_entityManager.addComponent<Component::Parent>(flame, entity, &transform.position, &transform.direction, &transform.velocity);
+	_entityManager.addComponent<Component::Parent>(flame, entity, &transform.position, &transform.direction, &transform.velocity, true);
 }
 
 void Scene_Play::spawnGammaWarning()

@@ -9,6 +9,7 @@ class Scene_Play : public Scene
 {
 protected:
 	Entity earth;
+	Entity earthDamage;
 	Entity shield;
 	Entity satellite;
 

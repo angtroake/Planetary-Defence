@@ -15,6 +15,8 @@ void AssetManager::init()
 
 	addTexture("Earth", "assets/img/earth3_512.png");
 	createSprite("Earth", getTexture("Earth"), 20, 20, 400, 3);
+	addTexture("EarthDamage", "assets/img/earth_damage.png");
+	createSprite("EarthDamage", getTexture("EarthDamage"), 20, 20, 400, 3);
 
 	addTexture("Health", "assets/img/health.png");
 	createSprite("Health", getTexture("Health"));
