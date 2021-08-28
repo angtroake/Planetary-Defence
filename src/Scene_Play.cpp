@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Physics.h"
 #include "Scene_Gameover.h";
+#include "Scene_Main_Menu.h";
 
 
 Scene_Play::Scene_Play(GameEngine* engine)
@@ -837,7 +838,7 @@ void Scene_Play::onKeyAction(std::string actionName, KeyAction action)
 {
 	if (actionName == "EXIT" && action.type == ActionType::KEY_PRESS) 
 	{
-		_engine->changeScene(nullptr, "MAIN_MENU", true);
+		_engine->changeScene(std::make_shared<Scene_Main_Menu>(_engine), "MAIN_MENU", true);
 	}
 	else if (actionName == "DEBUG" && action.type == ActionType::KEY_PRESS) 
 	{

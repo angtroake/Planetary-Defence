@@ -19,6 +19,7 @@ void Scene_Main_Menu::init()
 	registerKeyAction(sf::Keyboard::Enter, "ENTER");
 	registerKeyAction(sf::Keyboard::Space, "ENTER");
 
+	_engine->stopSounds();
 	_engine->getAssets().getSound("MusicMenu").play();
 	/*
 	auto earth = _entityManager.createEntity("Earth");
@@ -83,6 +84,7 @@ void Scene_Main_Menu::render()
 	text.setOutlineThickness(1.0f);
 	text.setFillColor(sf::Color(255, 255, 255));
 
+	/*
 	text.setCharacterSize(18);
 	text.setString("Current Score");
 	Util::centerText(text);
@@ -94,7 +96,7 @@ void Scene_Main_Menu::render()
 	Util::centerText(text);
 	text.setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y - 170.0f });
 	_engine->getWindow().draw(text);
-
+	*/
 	text.setCharacterSize(18);
 	text.setString("Best Score");
 	Util::centerText(text);
@@ -143,7 +145,7 @@ void Scene_Main_Menu::onKeyAction(std::string actionName, KeyAction action)
 		if (selectedMenuButton == 0) 
 		{
 			_engine->stopSounds();
-			_engine->changeScene(std::make_shared<Scene_Play>(_engine), "PLAY", false);
+			_engine->changeScene(std::make_shared<Scene_Play>(_engine), "PLAY", true);
 		}
 		//Exit Button
 		else if(selectedMenuButton == 1)
