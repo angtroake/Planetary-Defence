@@ -35,6 +35,11 @@ void GameEngine::run()
 	while (_isRunning && _window.isOpen()) 
 	{
 		update();
+
+		if (currentScore > bestScore) 
+		{
+			bestScore = currentScore;
+		}
 	}
 
 	std::ofstream f("best_score.txt");

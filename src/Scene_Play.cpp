@@ -18,17 +18,18 @@ void Scene_Play::init()
 	registerKeyAction(sf::Keyboard::BackSlash, "DEBUG");
 	registerKeyAction(sf::Keyboard::Down, "DOWN");
 	registerKeyAction(sf::Keyboard::Up, "UP");
-	registerKeyAction(sf::Keyboard::Left, "SATELLITE_LEFT");
-	registerKeyAction(sf::Keyboard::Right, "SATELLITE_RIGHT");
+	registerKeyAction(sf::Keyboard::A, "SATELLITE_LEFT");
+	registerKeyAction(sf::Keyboard::D, "SATELLITE_RIGHT");
 	registerKeyAction(sf::Keyboard::Space, "SATELLITE_SHOOT");
 	registerKeyAction(sf::Keyboard::S, "DOWN");
 	registerKeyAction(sf::Keyboard::W, "UP");
-	registerKeyAction(sf::Keyboard::A, "SHIELD_LEFT");
-	registerKeyAction(sf::Keyboard::D, "SHIELD_RIGHT");
+	registerKeyAction(sf::Keyboard::Left, "SHIELD_LEFT");
+	registerKeyAction(sf::Keyboard::Right, "SHIELD_RIGHT");
 
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid1"));
 	_asteroidSprites.push_back(_engine->getAssets().getSprite("Asteroid2"));
 
+	_engine->currentScore = 0;
 
 	Vec2 ropePos(_engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f - 148);
 	size_t ropeSegs = 20;
@@ -159,41 +160,44 @@ void Scene_Play::tick()
 	{
 		handleBoss();
 	}
-	else if (isBossWarning) 
-	{
-		
-	}
-	else
+	else if (!isBoss && !isBossWarning)
 	{
 		timeUntilAsteroid--;
 		if (timeUntilAsteroid <= 0)
 		{
 			spawnAsteroid();
-			timeUntilAsteroid =  2 * 60 + rand() % 600;
+			int time = (2 * 60 - 10 * difficulty) + rand() % (10 * 60 - 10 * difficulty);
+			if (time < 30) { time = 30; }
+			timeUntilAsteroid = time;
+			
 		}
 
 		timeUntilGamma--;
 		if (timeUntilGamma <= 0)
 		{
 			spawnGammaWarning();
-			timeUntilGamma = 120 + rand() % (60 * 20);
+			int time = (10 - 0.5 * difficulty) * 60 + rand() % (60 * (20 - difficulty));
+			if (time < 5 * 60) { time = 5 * 60; }
+			timeUntilGamma = time;
 		}
 
 		timeUntilUFO--;
 		if (timeUntilUFO <= 0)
 		{
 			spawnUFO();
-			timeUntilUFO = 2 * 60 + rand() % 600;
+			int time = (2 * 60 - 10 * difficulty) + rand() % (10 * 60 - 10 * difficulty);
+			if (time < 30) { time = 30; }
+			timeUntilUFO = time;
 		}
 
 		timeUntilBoss--;
 		if (timeUntilBoss <= 0) 
 		{
 			spawnBossWarning();
-			timeUntilBoss = 30 * 60;
+			timeUntilBoss = 60 * 60;
 		}
 
-		if (currentMusic != nullptr)
+		if (currentMusic != nullptr && !isBossWarning)
 		{
 			if (currentMusic->getStatus() == sf::SoundSource::Status::Stopped)
 			{
@@ -398,6 +402,9 @@ void Scene_Play::handleCollisions()
 			auto part = _entityManager.createEntity("Particle");
 			_entityManager.addComponent<Component::Transform>(part, transform.position + dir * 32, Vec2(0,0), Vec2(0.5, 0.5), false);
 			_entityManager.addComponent<Component::Material>(part, _engine->getAssets().getSprite("BlueExplosion"), false);
+
+
+			_engine->currentScore++;
 		}
 	}
 
@@ -435,7 +442,7 @@ void Scene_Play::handleCollisions()
 		else if (Physics::isColliding(_entityManager, entity, earth))
 		{
 			auto& health = _entityManager.getComponent<Component::Health>(earth);
-			health.health -= health.maxHealth;
+			health.health -= 3;
 		}
 	}
 
@@ -485,6 +492,8 @@ void Scene_Play::handleCollisions()
 				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
 				size_t soundIndex = rand() % 6;
 				_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
+
+				_engine->currentScore++;
 			}
 		}
 		
@@ -508,6 +517,8 @@ void Scene_Play::handleCollisions()
 				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
 				size_t soundIndex = rand() % 6;
 				_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
+
+				_engine->currentScore++;
 			}
 		}
 	}
@@ -849,12 +860,12 @@ void Scene_Play::handleBoss()
 	{
 		//_entityManager.destroyEntity(boss);
 		isBoss = false;
+		difficulty++;
+		_engine->stopSounds();
+
+		_engine->currentScore+=50;
 
 		currentMusic->stop();
-		currentMusicTrack = (currentMusicTrack + 1) % musicTrackCount;
-		currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
-		currentMusic->play();
-
 		currentMusic = &_engine->getAssets().getSound("BossWin");
 		currentMusic->play();
 
@@ -1062,7 +1073,7 @@ void Scene_Play::spawnBossWarning()
 		bossType = BossType::MOTHERSHIP;
 	}
 
+	isBossWarning = true;
 	currentMusic->stop();
 	_engine->getAssets().getSound("BossWarning").play();
-	isBossWarning = true;
 }
