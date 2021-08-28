@@ -336,6 +336,37 @@ void Scene_Play::renderHealth()
 	lostHealthRect.setOrigin(healthBarLength, 0);
 	lostHealthRect.setPosition({ _engine->getWindowSize().x - 20.0f, 50.0f });
 	_engine->getWindow().draw(lostHealthRect);
+
+	if (isBoss) 
+	{
+		healthBarLength = _engine->getWindowSize().x * 0.8;
+		text.setCharacterSize(36);
+		text.setFillColor(sf::Color(255, 255, 255));
+		text.setString("Boss Health");
+		Util::centerText(text);
+		text.setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y - 50.0f });
+		_engine->getWindow().draw(text);
+
+
+		healthRect.setSize({ healthBarLength, 10 });
+		healthRect.setOutlineColor(sf::Color(255, 255, 255));
+		healthRect.setFillColor(sf::Color(255, 0, 0));
+		healthRect.setOutlineThickness(5);
+		healthRect.setOrigin(healthBarLength / 2.0, 5);
+		healthRect.setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y - 25.0f });
+		_engine->getWindow().draw(healthRect);
+
+		lostHealth = _entityManager.getComponent<Component::Health>(boss).maxHealth - _entityManager.getComponent<Component::Health>(boss).health;
+		maxHealth = _entityManager.getComponent<Component::Health>(boss).maxHealth;
+
+		lostHealthRect.setSize({ healthBarLength * (lostHealth / maxHealth), 10 });
+		lostHealthRect.setOutlineColor(sf::Color(0, 0, 0));
+		lostHealthRect.setFillColor(sf::Color(0, 0, 0));
+		lostHealthRect.setOutlineThickness(0);
+		lostHealthRect.setOrigin(healthBarLength, 5);
+		lostHealthRect.setPosition({ _engine->getWindowSize().x / 2.0f + healthBarLength / 2.0f, _engine->getWindowSize().y - 25.0f });
+		_engine->getWindow().draw(lostHealthRect);
+	}
 }
 
 void Scene_Play::handleCollisions()
@@ -1092,7 +1123,7 @@ void Scene_Play::spawnHealth()
 {
 	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
 
-	float dist = 500;
+	float dist = 800;
 	float angle = (rand() % 2) == 0 ? PI / 2.0f : 3.0f * PI / 2.0f;
 	Vec2 pos(dist * sin(angle), dist * cos(angle));
 	pos = earthTransform.position + pos;
