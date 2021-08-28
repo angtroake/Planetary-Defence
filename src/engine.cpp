@@ -21,7 +21,7 @@ void GameEngine::init()
 
 
 	//std::vector<sf::VideoMode> videoModes = sf::VideoMode::getFullscreenModes();
-	_window.create(sf::VideoMode(1920, 1080), "GameJam", sf::Style::Fullscreen);
+	_window.create(sf::VideoMode(1920, 1080), "Planetary Defence", sf::Style::Fullscreen);
 	//_window.create(sf::VideoMode(1280, 720), "GameJam", sf::Style::Fullscreen);
 	_window.setFramerateLimit(60);
 
