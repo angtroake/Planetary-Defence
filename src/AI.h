@@ -35,8 +35,9 @@ protected:
 	EntityManager* entityManager;
 	Vec2* target;
 	Entity mothership;
+	Entity shield;
 public:
-	AIMothership(Entity mothership, Vec2* target, EntityManager* entityManager);
+	AIMothership(Entity mothership, Entity shield, Vec2* target, EntityManager* entityManager);
 	int randTimeToShoot();
 	int randTimeToSpawn();
 };

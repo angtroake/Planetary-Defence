@@ -161,17 +161,7 @@ void Scene_Play::tick()
 	}
 	else if (isBossWarning) 
 	{
-		currentMusic->stop();
-		if (musicFade > 0) 
-		{
-			musicFade -= 0.05f;
-			currentMusic->setVolume(DEFAULT_AUDIO_VOLUME * musicFade);
-		}
-		else 
-		{
-			currentMusic->stop();
-			currentMusic->setVolume(DEFAULT_AUDIO_VOLUME);
-		}
+		
 	}
 	else
 	{
@@ -202,17 +192,16 @@ void Scene_Play::tick()
 			spawnBossWarning();
 			timeUntilBoss = 30 * 60;
 		}
-	}
 
-
-	if (currentMusic != nullptr)
-	{
-		if (currentMusic->getStatus() == sf::SoundSource::Status::Stopped)
+		if (currentMusic != nullptr)
 		{
-			currentMusicTrack = (currentMusicTrack + 1) % musicTrackCount;
-			currentMusic->stop();
-			currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
-			currentMusic->play();
+			if (currentMusic->getStatus() == sf::SoundSource::Status::Stopped)
+			{
+				currentMusicTrack = (currentMusicTrack + 1) % musicTrackCount;
+				currentMusic->stop();
+				currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
+				currentMusic->play();
+			}
 		}
 	}
 
@@ -328,9 +317,12 @@ void Scene_Play::handleCollisions()
 			auto& t = _entityManager.getComponent<Component::Transform>(entity);
 			t.velocity.y = -5;
 
+			//Asteroid Explosion
 			auto p = _entityManager.createEntity("Particle");
 			_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(1, 1), false);
 			_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
+			size_t soundIndex = rand() % 6;
+			_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
 
 			_entityManager.getComponent<Component::Health>(earth).damage(1);
 		}
@@ -350,6 +342,8 @@ void Scene_Play::handleCollisions()
 			Entity p = _entityManager.createEntity("Particle");
 			_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(1, 1), false);
 			_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
+			size_t soundIndex = rand() % 6;
+			_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
 
 
 			auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
@@ -447,6 +441,8 @@ void Scene_Play::handleCollisions()
 				Entity p = _entityManager.createEntity("Particle");
 				_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(1, 1), false);
 				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
+				size_t soundIndex = rand() % 6;
+				_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
 			}
 		}
 		
@@ -468,22 +464,8 @@ void Scene_Play::handleCollisions()
 				auto p = _entityManager.createEntity("Particle");
 				_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(1, 1), false);
 				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
-			}
-		}
-
-		if (isBoss) 
-		{
-			if (Physics::isColliding(_entityManager, entity, boss)) 
-			{
-				_entityManager.destroyEntity(entity);
-				_entityManager.getComponent<Component::Health>(boss).damage(1);
-				//_entityManager.addComponent<Component::Invincibility>(boss, 10);
-
-				auto& t = _entityManager.getComponent<Component::Transform>(entity);
-				auto& m = _entityManager.getComponent<Component::Material>(entity);
-				auto p = _entityManager.createEntity("Particle");
-				_entityManager.addComponent<Component::Transform>(p, t.position + t.direction * m.sprite.getSize().y/2, Vec2(0, 0), Vec2(0.5, 0.5), false);
-				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
+				size_t soundIndex = rand() % 6;
+				_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
 			}
 		}
 	}
@@ -789,6 +771,36 @@ void Scene_Play::handleBoss()
 				transform.position = mothershipTransform.position + (earthTransform.position - mothershipTransform.position) / 2.0f;
 			}
 		}
+
+		for (Entity entity : _entityManager.getEntities("SatelliteBullet"))
+		{
+			bool hitShield = false;
+
+			for (Entity shield : _entityManager.getEntities("MothershipShield"))
+			{
+				if (Physics::isColliding(_entityManager, entity, shield)) 
+				{
+					hitShield = true;
+					_entityManager.addComponent<Component::Invincibility>(shield, 5);
+					_entityManager.destroyEntity(entity);
+				}
+			}
+			if (!hitShield && Physics::isColliding(_entityManager, entity, boss))
+			{
+				_entityManager.destroyEntity(entity);
+				_entityManager.getComponent<Component::Health>(boss).damage(1);
+				//_entityManager.addComponent<Component::Invincibility>(boss, 10);
+
+				auto& t = _entityManager.getComponent<Component::Transform>(entity);
+				auto& m = _entityManager.getComponent<Component::Material>(entity);
+				auto p = _entityManager.createEntity("Particle");
+				_entityManager.addComponent<Component::Transform>(p, t.position + t.direction * m.sprite.getSize().y / 2, Vec2(0, 0), Vec2(0.5, 0.5), false);
+
+
+				size_t soundIndex = rand() % 6;
+				_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
+			}
+		}
 	}
 
 	if (_entityManager.getComponent<Component::Health>(boss).health <= 0) 
@@ -801,20 +813,41 @@ void Scene_Play::handleBoss()
 		currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
 		currentMusic->play();
 
+		_engine->getAssets().getSound("Explode").play();
+		currentMusic = &_engine->getAssets().getSound("BossWin");
+		currentMusic->play();
 
-		//Asteroid Remove Animation
-		_entityManager.removeComponent<Component::Material>(boss);
-		_entityManager.addComponent<Component::Lifespan>(boss, 4 * 60);
-		_entityManager.removeComponent<Component::Orbit>(boss);
-		_entityManager.removeComponent<Component::BoundingBox>(boss);
-		_entityManager.removeComponent<Component::CAI>(boss);
-		auto& t = _entityManager.getComponent<Component::Transform>(boss);
-		t.velocity.y = -5;
 
-		//Asteroid Explosion
-		Entity p = _entityManager.createEntity("Particle");
-		_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(2, 2), false);
-		_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
+		if (bossType == BossType::MOTHERSHIP) 
+		{
+			//remove any lazers shooting
+			for (Entity entity : _entityManager.getEntities("MothershipLaser")) 
+			{
+				_entityManager.destroyEntity(entity);
+			}
+
+			//Remove Shield
+			for (Entity shield : _entityManager.getEntities("MothershipShield")) 
+			{
+				_entityManager.destroyEntity(shield);
+			}
+
+			//Remove Animation
+			_entityManager.removeComponent<Component::Material>(boss);
+			_entityManager.addComponent<Component::Lifespan>(boss, 4 * 60);
+			_entityManager.removeComponent<Component::Orbit>(boss);
+			_entityManager.removeComponent<Component::BoundingBox>(boss);
+			_entityManager.removeComponent<Component::CAI>(boss);
+			auto& t = _entityManager.getComponent<Component::Transform>(boss);
+			t.velocity.y = -5;
+
+			//Explosion
+			Entity p = _entityManager.createEntity("Particle");
+			_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(2, 2), false);
+			_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
+			size_t soundIndex = rand() % 6;
+			_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
+		}
 	}
 }
 
@@ -934,6 +967,14 @@ void Scene_Play::spawnBoss()
 		Vec2 ropeVec = (pos - Vec2(pos.x, pos.y - segDist * ropeSegs));
 		Vec2 startPos = Vec2(pos.x, pos.y - segDist * ropeSegs) + Vec2(ropeVec.x * cos(startAngle) - ropeVec.y * sin(startAngle), ropeVec.x * sin(startAngle) + ropeVec.y * cos(startAngle)) * 0.9f;
 
+
+		//CREATE MOTHERSHIP SHIELD
+		auto mShield = _entityManager.createEntity("MothershipShield");
+		_entityManager.addComponent<Component::Transform>(mShield, Vec2(startPos), Vec2(0, 0), Vec2(1.1, 1.1), false);
+		_entityManager.addComponent<Component::Material>(mShield, _engine->getAssets().getSprite("MothershipShield"), true);
+		_entityManager.addComponent<Component::BoundingBox>(mShield, _engine->getAssets().getSprite("MothershipShield").getSize());
+
+		//CREATE MOTHERSHIP
 		boss = _entityManager.createEntity("Boss");
 		auto& transform = _entityManager.addComponent<Component::Transform>(boss, startPos, Vec2(0, 0), Vec2(1, 1), true);
 		auto& mat = _entityManager.addComponent<Component::Material>(boss, _engine->getAssets().getSprite("Mothership"), true);
@@ -947,7 +988,7 @@ void Scene_Play::spawnBoss()
 		ani->init(boss, _entityManager);
 		_entityManager.addComponent<Component::CAnimation>(boss, ani);
 
-		std::shared_ptr<AIMothership> ai = std::make_shared<AIMothership>(boss, &earthTransform.position, &_entityManager);
+		std::shared_ptr<AIMothership> ai = std::make_shared<AIMothership>(boss, mShield, &earthTransform.position, &_entityManager);
 		_entityManager.addComponent<Component::CAI>(boss, ai);
 	}
 
@@ -980,6 +1021,7 @@ void Scene_Play::spawnBossWarning()
 		bossType = BossType::MOTHERSHIP;
 	}
 
+	currentMusic->stop();
 	_engine->getAssets().getSound("BossWarning").play();
 	isBossWarning = true;
 }

@@ -43,6 +43,8 @@ void AssetManager::init()
 	addSound("MothershipCharge", "assets/sounds/mothership_charge.ogg");
 	getSound("MothershipCharge").setVolume(50);
 	addSound("MothershipShoot", "assets/sounds/mothership_shoot.wav");
+	addTexture("MothershipShield", "assets/img/mothership_shield.png");
+	createSprite("MothershipShield", getTexture("MothershipShield"));
 
 
 	//Laser
@@ -60,8 +62,11 @@ void AssetManager::init()
 	addSound("MusicPlay0", "assets/music/Dungeon1.ogg");
 	addSound("MusicPlay1", "assets/music/Dungeon2.ogg");
 	addSound("BossMusic0", "assets/music/Battle1.ogg");
+	getSound("BossMusic0").setLoop(true);
 	addSound("BossMusic1", "assets/music/Battle2.ogg");
+	getSound("BossMusic1").setLoop(true);
 	addSound("BossMusic2", "assets/music/Battle3.ogg");
+	getSound("BossMusic2").setLoop(true);
 	addSound("BossWin", "assets/music/Victory.ogg");
 	addSound("GameOver", "assets/music/GameOver.ogg");
 
@@ -73,6 +78,12 @@ void AssetManager::init()
 	addSound("SatelliteReady", "assets/sounds/satellite_ready.wav");
 	addSound("BossWarning", "assets/sounds/boss_warning.wav");
 	addSound("GammaWarning", "assets/sounds/gamma_warning.ogg");
+	addSound("Explode0", "assets/sounds/explode0.wav");
+	addSound("Explode1", "assets/sounds/explode1.wav");
+	addSound("Explode2", "assets/sounds/explode2.wav");
+	addSound("Explode3", "assets/sounds/explode3.wav");
+	addSound("Explode4", "assets/sounds/explode4.wav");
+	addSound("Explode5", "assets/sounds/explode5.wav");
 
 	//Particles
 	addTexture("BlueExplosion", "assets/img/blue_explosion.png");
