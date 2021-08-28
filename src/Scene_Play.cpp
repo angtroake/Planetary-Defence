@@ -974,6 +974,8 @@ void Scene_Play::spawnGamma(Vec2 dir)
 	bbSize.y *= 6;
 	_entityManager.addComponent<Component::BoundingBox>(gamma, bbSize );
 	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 60 * 5);
+
+	_engine->getAssets().getSound("GammaRay").play();
 }
 
 void Scene_Play::spawnUFO() 

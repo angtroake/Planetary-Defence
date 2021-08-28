@@ -92,6 +92,7 @@ void AssetManager::init()
 	addSound("Explode3", "assets/sounds/explode3.wav");
 	addSound("Explode4", "assets/sounds/explode4.wav");
 	addSound("Explode5", "assets/sounds/explode5.wav");
+	addSound("GammaRay", "assets/sounds/gammaray.ogg");
 
 	//Particles
 	addTexture("BlueExplosion", "assets/img/blue_explosion.png");
