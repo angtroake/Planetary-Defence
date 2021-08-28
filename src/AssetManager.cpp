@@ -4,6 +4,12 @@
 
 void AssetManager::init() 
 {
+
+	addTexture("Background", "assets/img/background.png");
+	createSprite("Background", getTexture("Background"));
+	addTexture("Curtain", "assets/img/curtain.jpg");
+	createSprite("Curtain", getTexture("Curtain"));
+
 	addFont("Crater", "assets/fonts/Crater.otf");
 
 	addTexture("Earth", "assets/img/earth3_512.png");

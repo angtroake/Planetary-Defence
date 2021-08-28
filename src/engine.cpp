@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "Scene_Main_Menu.h"
 #include <iostream>
+#include <fstream>
 
 GameEngine::GameEngine()
 {
@@ -10,6 +11,15 @@ GameEngine::GameEngine()
 
 void GameEngine::init() 
 {
+
+	std::ifstream f("best_score.txt");
+	while (f.good()) 
+	{
+		f >> bestScore;
+	}
+	f.close();
+
+
 	std::vector<sf::VideoMode> videoModes = sf::VideoMode::getFullscreenModes();
 	_window.create(videoModes[0], "GameJam", sf::Style::Fullscreen);
 	//_window.create(sf::VideoMode(1280, 720), "GameJam");
@@ -26,6 +36,11 @@ void GameEngine::run()
 	{
 		update();
 	}
+
+	std::ofstream f("best_score.txt");
+	f << bestScore;
+	f.close();
+
 }
 
 void GameEngine::update() 

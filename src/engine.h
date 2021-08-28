@@ -17,6 +17,10 @@ public:
 	
 	void fadePlayingSounds();
 	void stopSounds();
+
+	size_t bestScore = 0;
+	size_t currentScore = 0;
+
 protected:
 	
 	sf::RenderWindow _window;
@@ -30,10 +34,8 @@ protected:
 	float soundFadeDecrease = 0.01f;
 	bool fadeSounds = false;
 
+
 	void init();
 	void update();
 	void handleInput();
-
-
-
 };

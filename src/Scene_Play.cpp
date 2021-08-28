@@ -222,6 +222,48 @@ void Scene_Play::render()
 	_engine->getWindow().setView(_engine->getWindow().getDefaultView());
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
+	/*
+	Sprite spr = _engine->getAssets().getSprite("Curtain");
+	spr.get().setOrigin({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
+	spr.get().setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
+	_engine->getWindow().draw(spr.get());
+	*/
+
+	Sprite spr = _engine->getAssets().getSprite("Background");
+	spr.get().setOrigin({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
+	spr.get().setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
+	_engine->getWindow().draw(spr.get());
+
+	sf::Text text;
+	text.setFont(_engine->getAssets().getFont("Crater"));
+	text.setOutlineColor(sf::Color(0, 0, 0));
+	text.setOutlineThickness(1.0f);
+	text.setFillColor(sf::Color(255, 255, 255));
+
+	text.setCharacterSize(18);
+	text.setString("Current Score");
+	Util::centerText(text);
+	text.setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y - 200.0f });
+	_engine->getWindow().draw(text);
+
+	text.setCharacterSize(36);
+	text.setString(std::to_string(_engine->currentScore));
+	Util::centerText(text);
+	text.setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y - 170.0f });
+	_engine->getWindow().draw(text);
+
+	text.setCharacterSize(18);
+	text.setString("Best Score");
+	Util::centerText(text);
+	text.setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y - 120.0f });
+	_engine->getWindow().draw(text);
+
+	text.setCharacterSize(36);
+	text.setString(std::to_string(_engine->bestScore));
+	Util::centerText(text);
+	text.setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y - 90.0f });
+	_engine->getWindow().draw(text);
+
 	//Render Before Earth
 	for (auto entity : _entityManager.getEntities())
 	{
@@ -813,7 +855,6 @@ void Scene_Play::handleBoss()
 		currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
 		currentMusic->play();
 
-		_engine->getAssets().getSound("Explode").play();
 		currentMusic = &_engine->getAssets().getSound("BossWin");
 		currentMusic->play();
 

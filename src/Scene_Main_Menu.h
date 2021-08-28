@@ -3,8 +3,8 @@
 class Scene_Main_Menu : public Scene
 {
 protected:
-	const std::string menuButtons[3] = {"Play", "Options", "Exit"};
-	const int8_t menuButtonCount = 3;
+	const std::string menuButtons[2] = {"Play", "Exit"};
+	const int8_t menuButtonCount = 2;
 	int8_t selectedMenuButton = 0;
 
 public:
