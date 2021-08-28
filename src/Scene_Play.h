@@ -18,10 +18,10 @@ protected:
 	size_t satelliteCooldownMax = 0.25 * 60;
 	size_t satelliteCooldown = satelliteCooldownMax;
 
-	size_t timeUntilAsteroid = 120;
-	size_t timeUntilGamma = 300;
-	size_t timeUntilUFO = 160;
-	size_t timeUntilBoss;
+	size_t timeUntilAsteroid = randAsteroidTime();
+	size_t timeUntilGamma = randGammaTime();
+	size_t timeUntilUFO = randUFOTime();
+	size_t timeUntilBoss = randBossTime();
 
 	std::vector<Sprite> _asteroidSprites;
 
@@ -64,4 +64,9 @@ public:
 	void spawnBoss();
 	void spawnBossWarning();
 	void spawnHealth();
+
+	size_t randUFOTime();
+	size_t randAsteroidTime();
+	size_t randGammaTime();
+	size_t randBossTime();
 };

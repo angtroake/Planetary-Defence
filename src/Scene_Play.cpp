@@ -36,7 +36,7 @@ void Scene_Play::init()
 	float segDist = ropePos.y / ropeSegs;
 
 	earth = _entityManager.createEntity("Earth");
-	auto & earthTransfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 250, -200), Vec2(0,0), Vec2(0.8,0.8), true);
+	auto & earthTransfrom = _entityManager.addComponent<Component::Transform>(earth, Vec2(_engine->getWindow().getSize().x/2 + 300, -200), Vec2(0,0), Vec2(0.8,0.8), true);
 	_entityManager.addComponent<Component::Material>(earth, _engine->getAssets().getSprite("Earth"), true);
 	_entityManager.addComponent<Component::Health>(earth, 100);
 	_entityManager.addComponent<Component::BoundingBox>(earth, Vec2(256, 256));
@@ -44,6 +44,7 @@ void Scene_Play::init()
 	//std::shared_ptr<AnimationDrop> ani = std::make_shared<AnimationDrop>(_engine, _engine->getWindow().getSize().y / 2);
 	//ani->init(earth, _entityManager);
 	//_entityManager.addComponent<Component::CAnimation>(earth, ani);
+	handleRope(earth);
 
 	shield = _entityManager.createEntity("Shield");
 	auto & shieldTransform = _entityManager.addComponent<Component::Transform>(shield, Vec2(0, 0), Vec2(0, 0), Vec2(1, 0.7), true);
@@ -63,8 +64,6 @@ void Scene_Play::init()
 	currentMusicTrack = rand() % musicTrackCount;
 	currentMusic = &_engine->getAssets().getSound("MusicPlay" + std::to_string(currentMusicTrack));
 	currentMusic->play();
-
-	timeUntilBoss = 30 * 60;
 }
 
 void Scene_Play::tick()
@@ -76,6 +75,7 @@ void Scene_Play::tick()
 
 
 	//Entity Logic
+	/*
 	for (auto entity : _entityManager.getEntities())
 	{
 		
@@ -91,6 +91,45 @@ void Scene_Play::tick()
 		handleLifespan(entity);
 		handleOrbit(entity);
 		handleAnimations(entity);
+		handleMovement(entity);
+	}
+	*/
+
+	for (Entity entity : _entityManager.getEntities()) 
+	{
+		if (_entityManager.hasComponent<Component::CAI>(entity))
+		{
+			_entityManager.getComponent<Component::CAI>(entity).ai->simulate(_engine);
+		}
+	}
+
+	for (Entity entity : _entityManager.getEntities()) 
+	{
+		handleRope(entity);
+	}
+
+	for (Entity entity : _entityManager.getEntities())
+	{
+		handleControls(entity);
+	}
+
+	for (Entity entity : _entityManager.getEntities())
+	{
+		handleLifespan(entity);
+	}
+
+	for (Entity entity : _entityManager.getEntities())
+	{
+		handleOrbit(entity);
+	}
+
+	for (Entity entity : _entityManager.getEntities())
+	{
+		handleAnimations(entity);
+	}
+
+	for (Entity entity : _entityManager.getEntities())
+	{
 		handleMovement(entity);
 	}
 
@@ -116,10 +155,10 @@ void Scene_Play::tick()
 		timeUntilAsteroid--;
 		if (timeUntilAsteroid <= 0)
 		{
-			spawnAsteroid();
-			int time = (2 * 60 - 10 * difficulty) + rand() % (10 * 60 - 10 * difficulty);
-			if (time < 30) { time = 30; }
-			timeUntilAsteroid = time;
+			for (size_t i = 0; i < difficulty /2.0f + 2 ; i++) {
+				spawnAsteroid();
+			}
+			timeUntilAsteroid = randAsteroidTime();
 			
 		}
 
@@ -127,25 +166,30 @@ void Scene_Play::tick()
 		if (timeUntilGamma <= 0)
 		{
 			spawnGammaWarning();
-			int time = (10 - 0.5 * difficulty) * 60 + rand() % (60 * (20 - difficulty));
-			if (time < 5 * 60) { time = 5 * 60; }
-			timeUntilGamma = time;
+			timeUntilGamma = randGammaTime();
 		}
 
 		timeUntilUFO--;
 		if (timeUntilUFO <= 0)
 		{
-			spawnUFO2();
-			int time = (2 * 60 - 10 * difficulty) + rand() % (10 * 60 - 10 * difficulty);
-			if (time < 30) { time = 30; }
-			timeUntilUFO = time;
+			for (size_t i = 0; i < difficulty/3.0f + 1; i++) {
+				if (rand() % 2 == 0)
+				{
+					spawnUFO();
+				}
+				else
+				{
+					spawnUFO2();
+				}
+			}
+			timeUntilUFO = randUFOTime();
 		}
 
 		timeUntilBoss--;
 		if (timeUntilBoss <= 0) 
 		{
 			spawnBossWarning();
-			timeUntilBoss = 60 * 60;
+			timeUntilBoss = randBossTime();
 		}
 
 		if (currentMusic != nullptr && !isBossWarning)
@@ -712,7 +756,7 @@ void Scene_Play::handleRope(Entity entity)
 
 		}
 
-		for (int j = 0; j < 30; j++) {
+		for (int j = 0; j < 10; j++) {
 			for (int i = 1; i < rope.ropeLength; i++)
 			{
 				//rope constraints
@@ -732,11 +776,6 @@ void Scene_Play::handleRope(Entity entity)
 					rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
 				}
 			}
-		}
-
-		if (_entityManager.getTag(entity) == "UFO") 
-		{
-			float a = 0;
 		}
 
 		if (rope.direction != nullptr)
@@ -1186,4 +1225,31 @@ void Scene_Play::spawnHealth()
 	auto& mat = _entityManager.addComponent<Component::Material>(health, _engine->getAssets().getSprite("Health"), true);
 	_entityManager.addComponent<Component::Rope>(health, ropeSegs, segDist, Vec2(pos.x, pos.y - segDist * ropeSegs), &transform.position, &transform.direction, Vec2(0, 0), true);
 	_entityManager.addComponent<Component::BoundingBox>(health, mat.sprite.getSize() * 0.2);
+}
+
+size_t Scene_Play::randUFOTime()
+{
+	//int time = (2 * 60 - 10 * difficulty) + rand() % (10 * 60 - 10 * difficulty);
+	int time = (-0.3f * (float)difficulty + 3) * 60 ;
+	if (time < 30) { time = 30; }
+	return time;
+}
+
+size_t Scene_Play::randAsteroidTime()
+{
+	int time = (-0.3f * (float)difficulty + 3.0f) * 60;
+	if (time < 10) { time = 10; }
+	return time;
+}
+
+size_t Scene_Play::randGammaTime()
+{
+	int time = (20 - 2 * difficulty + rand() % 3) * 60;
+	if (time < 5 * 60) { time = 5 * 60; }
+	return time;
+}
+
+size_t Scene_Play::randBossTime()
+{
+	return 60 * 60;
 }
