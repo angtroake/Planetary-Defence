@@ -241,12 +241,10 @@ void Scene_Play::render()
 	_engine->getWindow().setView(_engine->getWindow().getDefaultView());
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
-	/*
 	Sprite spr = _engine->getAssets().getSprite("Background");
-	spr.get().setOrigin({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
+	spr.get().setOrigin({ spr.getSize().x / 2.0f, spr.getSize().y / 2.0f });
 	spr.get().setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
 	_engine->getWindow().draw(spr.get());
-	*/
 
 	sf::Text text;
 	text.setFont(_engine->getAssets().getFont("Crater"));

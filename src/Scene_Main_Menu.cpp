@@ -39,6 +39,11 @@ void Scene_Main_Menu::render()
 	spr.get().setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
 	_engine->getWindow().draw(spr.get());
 
+	spr = _engine->getAssets().getSprite("MenuImg");
+	spr.get().setOrigin({ spr.getSize().x / 2.0f, spr.getSize().y / 2.0f });
+	spr.get().setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
+	_engine->getWindow().draw(spr.get());
+
 	//Draw Title
 	sf::Text text;
 	text.setFont(_engine->getAssets().getFont("Crater"));

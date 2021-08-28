@@ -5,7 +5,10 @@
 void AssetManager::init() 
 {
 
-	addTexture("Background", "assets/img/background2.png");
+	addTexture("MenuImg", "assets/img/menu.png");
+	createSprite("MenuImg", getTexture("MenuImg"));
+
+	addTexture("Background", "assets/img/space.png");
 	createSprite("Background", getTexture("Background"));
 
 	addFont("Crater", "assets/fonts/Crater.otf");
