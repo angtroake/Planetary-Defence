@@ -1323,7 +1323,7 @@ void Scene_Play::spawnHealth()
 size_t Scene_Play::randUFOTime()
 {
 	//int time = (2 * 60 - 10 * difficulty) + rand() % (10 * 60 - 10 * difficulty);
-	int time = (-0.3f * (float)difficulty + 3) * 60 ;
+	int time = (-0.3f * (float)difficulty + 5.0f) * 60 ;
 	if (time < 30) { time = 30; }
 	return time;
 }
