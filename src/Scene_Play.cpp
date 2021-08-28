@@ -227,16 +227,11 @@ void Scene_Play::render()
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
 	/*
-	Sprite spr = _engine->getAssets().getSprite("Curtain");
-	spr.get().setOrigin({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
-	spr.get().setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
-	_engine->getWindow().draw(spr.get());
-	*/
-
 	Sprite spr = _engine->getAssets().getSprite("Background");
 	spr.get().setOrigin({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
 	spr.get().setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
 	_engine->getWindow().draw(spr.get());
+	*/
 
 	sf::Text text;
 	text.setFont(_engine->getAssets().getFont("Crater"));
@@ -520,6 +515,17 @@ void Scene_Play::handleCollisions()
 
 				_engine->currentScore++;
 			}
+		}
+	}
+
+	for (Entity entity : _entityManager.getEntities("Health")) 
+	{
+		if (Physics::isColliding(_entityManager, entity, earth))
+		{
+			auto& h = _entityManager.getComponent<Component::Health>(earth);
+			h.health = h.maxHealth;
+			_engine->getAssets().getSound("GetHealth").play();
+			_entityManager.destroyEntity(entity);
 		}
 	}
 }
@@ -869,6 +875,8 @@ void Scene_Play::handleBoss()
 		currentMusic = &_engine->getAssets().getSound("BossWin");
 		currentMusic->play();
 
+		spawnHealth();
+
 
 		if (bossType == BossType::MOTHERSHIP) 
 		{
@@ -1076,4 +1084,30 @@ void Scene_Play::spawnBossWarning()
 	isBossWarning = true;
 	currentMusic->stop();
 	_engine->getAssets().getSound("BossWarning").play();
+}
+
+void Scene_Play::spawnHealth()
+{
+	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+
+	float dist = 500;
+	float angle = (rand() % 2) == 0 ? PI / 2.0f : 3.0f * PI / 2.0f;
+	Vec2 pos(dist * sin(angle), dist * cos(angle));
+	pos = earthTransform.position + pos;
+
+	size_t ropeSegs = 20;
+	float segDist = (_engine->getWindow().getSize().y) / ropeSegs;
+
+	float startAngle = (angle == PI / 2.0f ? -PI / 2.0f : PI / 2.0f);
+	Vec2 ropeVec = (pos - Vec2(pos.x, pos.y - segDist * ropeSegs));
+	Vec2 startPos = Vec2(pos.x, pos.y - segDist * ropeSegs) + Vec2(ropeVec.x * cos(startAngle) - ropeVec.y * sin(startAngle), ropeVec.x * sin(startAngle) + ropeVec.y * cos(startAngle)) * 0.9f;
+
+	Vec2 vel = earthTransform.position - pos;
+	vel = vel / vel.mag() * 3.0f;
+
+	auto health = _entityManager.createEntity("Health");
+	auto& transform = _entityManager.addComponent<Component::Transform>(health, startPos, vel, Vec2(1, 1), true);
+	auto& mat = _entityManager.addComponent<Component::Material>(health, _engine->getAssets().getSprite("Health"), true);
+	_entityManager.addComponent<Component::Rope>(health, ropeSegs, segDist, Vec2(pos.x, pos.y - segDist * ropeSegs), &transform.position, &transform.direction, Vec2(0, 0), true);
+	_entityManager.addComponent<Component::BoundingBox>(health, mat.sprite.getSize() * 0.2);
 }

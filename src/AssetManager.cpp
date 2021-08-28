@@ -5,15 +5,17 @@
 void AssetManager::init() 
 {
 
-	addTexture("Background", "assets/img/background.png");
+	addTexture("Background", "assets/img/background2.png");
 	createSprite("Background", getTexture("Background"));
-	addTexture("Curtain", "assets/img/curtain.jpg");
-	createSprite("Curtain", getTexture("Curtain"));
 
 	addFont("Crater", "assets/fonts/Crater.otf");
 
 	addTexture("Earth", "assets/img/earth3_512.png");
 	createSprite("Earth", getTexture("Earth"), 20, 20, 400, 3);
+
+	addTexture("Health", "assets/img/health.png");
+	createSprite("Health", getTexture("Health"));
+	addSound("GetHealth", "assets/sounds/get_health.wav");
 
 	//Asteroids
 	addTexture("Asteroid1", "assets/img/asteroid1.png");

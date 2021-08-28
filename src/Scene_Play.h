@@ -61,4 +61,5 @@ public:
 	void spawnUFO();
 	void spawnBoss();
 	void spawnBossWarning();
+	void spawnHealth();
 };

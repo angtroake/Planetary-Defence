@@ -34,17 +34,10 @@ void Scene_Main_Menu::render()
 	_engine->getWindow().setView(_engine->getWindow().getDefaultView());
 	_engine->getWindow().clear(sf::Color(0, 0, 0));
 
-	/*
-	Sprite spr = _engine->getAssets().getSprite("Curtain");
-	spr.get().setOrigin({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
-	spr.get().setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
-	_engine->getWindow().draw(spr.get());
-	*/
 	Sprite spr = _engine->getAssets().getSprite("Background");
-	spr.get().setOrigin({_engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f});
+	spr.get().setOrigin({spr.getSize().x / 2.0f, spr.getSize().y / 2.0f});
 	spr.get().setPosition({ _engine->getWindowSize().x / 2.0f, _engine->getWindowSize().y / 2.0f });
 	_engine->getWindow().draw(spr.get());
-
 
 	//Draw Title
 	sf::Text text;
@@ -57,7 +50,6 @@ void Scene_Main_Menu::render()
 	text.setPosition({_engine->getWindowSize().x/2.0f, 60});
 	_engine->getWindow().draw(text);
 	*/
-
 	for (auto entity : _entityManager.getEntities()) 
 	{
 		renderEntity(entity);
@@ -78,7 +70,7 @@ void Scene_Main_Menu::render()
 		text.setCharacterSize(36);
 		text.setString(menuButtons[i]);
 		Util::centerText(text);
-		text.setPosition({ _engine->getWindowSize().x / 2.0f, 300 + 50 * (float)i });
+		text.setPosition({ _engine->getWindowSize().x / 2.0f, 500 + 50 * (float)i });
 		_engine->getWindow().draw(text);
 	}
 
