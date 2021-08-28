@@ -795,7 +795,7 @@ void Scene_Play::handleBoss()
 				auto& m = _entityManager.getComponent<Component::Material>(entity);
 				auto p = _entityManager.createEntity("Particle");
 				_entityManager.addComponent<Component::Transform>(p, t.position + t.direction * m.sprite.getSize().y / 2, Vec2(0, 0), Vec2(0.5, 0.5), false);
-
+				_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
 
 				size_t soundIndex = rand() % 6;
 				_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
