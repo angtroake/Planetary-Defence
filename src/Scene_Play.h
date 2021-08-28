@@ -45,6 +45,7 @@ protected:
 	void handleAnimations(Entity entity);
 	void handleLifespan(Entity entity);
 	void handleControls(Entity entity);
+	void handleRope(Entity entity);
 	void handleBoss();
 
 public:
@@ -59,6 +60,7 @@ public:
 	void spawnGammaWarning();
 	void spawnGamma(Vec2 dir);
 	void spawnUFO();
+	void spawnUFO2();
 	void spawnBoss();
 	void spawnBossWarning();
 	void spawnHealth();

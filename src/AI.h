@@ -17,11 +17,12 @@ class AIUFO : public AI
 protected:
 	void tick(GameEngine* engine);
 	int timeToShoot;
+	size_t maxTimeToShoot;
 	EntityManager* entityManager;
 	Vec2* target;
 	Vec2* position;
 public:
-	AIUFO(Vec2* position, Vec2* target, EntityManager* entityManager);
+	AIUFO(Vec2* position, Vec2* target, EntityManager* entityManager, size_t maxTimeToShoot);
 };
 
 class AIMothership : public AI 

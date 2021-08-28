@@ -32,4 +32,6 @@ public:
 	
 	void setGlobalSoundVolume(float volume);
 	void stopAllSounds();
+
+	void destroy();
 };

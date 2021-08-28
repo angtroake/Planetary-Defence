@@ -6,10 +6,10 @@ void AI::simulate(GameEngine* engine)
 	tick(engine);
 }
 
-AIUFO::AIUFO(Vec2* position, Vec2* target, EntityManager* entityManager)
-	:position(position), target(target), entityManager(entityManager)
+AIUFO::AIUFO(Vec2* position, Vec2* target, EntityManager* entityManager,size_t maxTimeToShoot)
+	:position(position), target(target), entityManager(entityManager), maxTimeToShoot(maxTimeToShoot)
 {
-	timeToShoot = 3 * 60 + (rand() % (3 * 60));
+	timeToShoot = maxTimeToShoot;
 }
 
 void AIUFO::tick(GameEngine* engine)
@@ -30,7 +30,7 @@ void AIUFO::tick(GameEngine* engine)
 		int num = rand() % 4 + 1;
 		engine->getAssets().getSound("Laser" + std::to_string(num)).play();
 
-		timeToShoot = 3 * 60 + (rand() % (3 * 60));
+		timeToShoot = maxTimeToShoot;
 	}
 }
 
@@ -107,7 +107,8 @@ void AIMothership::tick(GameEngine* engine)
 				auto& mat = entityManager->addComponent<Component::Material>(ufo, engine->getAssets().getSprite("UFO"), true);
 				entityManager->addComponent<Component::BoundingBox>(ufo, (mat.sprite.getSize() * 0.6f));
 
-				std::shared_ptr<AIUFO> ai = std::make_shared<AIUFO>(&t.position, target, entityManager);
+				size_t timeToShoot = 3 * 60 + (rand() % (3 * 60));
+				std::shared_ptr<AIUFO> ai = std::make_shared<AIUFO>(&t.position, target, entityManager, timeToShoot);
 				entityManager->addComponent<Component::CAI>(ufo, ai);
 
 				//copy rope of mothership to ufo

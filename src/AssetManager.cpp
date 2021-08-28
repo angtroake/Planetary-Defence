@@ -240,3 +240,11 @@ void AssetManager::setGlobalSoundVolume(float volume)
 	}
 }
 
+void AssetManager::destroy()
+{
+	_textures.clear();
+	_sprites.clear();
+	_sounds.clear();
+	_soundBuffers.clear();
+	_fonts.clear();
+} 

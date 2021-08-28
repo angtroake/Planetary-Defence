@@ -78,56 +78,7 @@ void Scene_Play::tick()
 	//Entity Logic
 	for (auto entity : _entityManager.getEntities())
 	{
-		//Rope Update
-		if (_entityManager.hasComponent<Component::Rope>(entity)) 
-		{
-			auto& rope = _entityManager.getComponent<Component::Rope>(entity);
-			
-			for (int i = 1; i < rope.ropeLength; i++) 
-			{
-				Vec2 vel = rope.segmentPositions[i] - rope.prevSegmentPositions[i];
-				rope.prevSegmentPositions[i] = rope.segmentPositions[i];
-
-				vel.y += GRAVITY;
-				vel = vel * 0.98f;
-				rope.segmentPositions[i] = rope.segmentPositions[i] + vel;
-
-			}
-
-			for (int j = 0; j < 30; j++) {
-				for (int i = 1; i < rope.ropeLength; i++)
-				{
-					//rope constraints
-					Vec2 dir = rope.segmentPositions[i - 1] - rope.segmentPositions[i];
-					dir = dir / dir.mag();
-
-					float d = rope.segmentPositions[i].dist(rope.segmentPositions[i - 1]);
-					float err = d - rope.segmentDistance;
-
-					if (i == 1) 
-					{
-						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
-					}
-					else 
-					{
-						rope.segmentPositions[i - 1] = rope.segmentPositions[i - 1] - (dir * err * 0.8f);
-						rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
-					}
-				}
-			}
-
-			if (rope.direction != nullptr) 
-			{
-				*rope.direction = rope.segmentPositions[rope.ropeLength - 2] - rope.segmentPositions[rope.ropeLength - 1];
-				float angle = rope.positionOffset.angle(*rope.direction);
-				Vec2 newOffset(rope.positionOffset.x*cos(angle) - rope.positionOffset.y*sin(angle), rope.positionOffset.x*sin(angle) + rope.positionOffset.y * cos(angle));
-				*rope.position = rope.segmentPositions[rope.ropeLength - 1] - newOffset;
-			}
-			else
-			{
-				*rope.position = rope.segmentPositions[rope.ropeLength - 1] + rope.positionOffset;
-			}
-		}
+		
 
 		//AI TICK
 		if (_entityManager.hasComponent<Component::CAI>(entity)) 
@@ -135,7 +86,7 @@ void Scene_Play::tick()
 			_entityManager.getComponent<Component::CAI>(entity).ai->simulate(_engine);
 		}
 
-
+		handleRope(entity);
 		handleControls(entity);
 		handleLifespan(entity);
 		handleOrbit(entity);
@@ -184,7 +135,7 @@ void Scene_Play::tick()
 		timeUntilUFO--;
 		if (timeUntilUFO <= 0)
 		{
-			spawnUFO();
+			spawnUFO2();
 			int time = (2 * 60 - 10 * difficulty) + rand() % (10 * 60 - 10 * difficulty);
 			if (time < 30) { time = 30; }
 			timeUntilUFO = time;
@@ -743,6 +694,64 @@ void Scene_Play::handleAnimations(Entity entity)
 	}
 }
 
+void Scene_Play::handleRope(Entity entity)
+{
+	//Rope Update
+	if (_entityManager.hasComponent<Component::Rope>(entity))
+	{
+		auto& rope = _entityManager.getComponent<Component::Rope>(entity);
+
+		for (int i = 1; i < rope.ropeLength; i++)
+		{
+			Vec2 vel = rope.segmentPositions[i] - rope.prevSegmentPositions[i];
+			rope.prevSegmentPositions[i] = rope.segmentPositions[i];
+
+			vel.y += GRAVITY;
+			vel = vel * 0.98f;
+			rope.segmentPositions[i] = rope.segmentPositions[i] + vel;
+
+		}
+
+		for (int j = 0; j < 30; j++) {
+			for (int i = 1; i < rope.ropeLength; i++)
+			{
+				//rope constraints
+				Vec2 dir = rope.segmentPositions[i - 1] - rope.segmentPositions[i];
+				dir = dir / dir.mag();
+
+				float d = rope.segmentPositions[i].dist(rope.segmentPositions[i - 1]);
+				float err = d - rope.segmentDistance;
+
+				if (i == 1)
+				{
+					rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
+				}
+				else
+				{
+					rope.segmentPositions[i - 1] = rope.segmentPositions[i - 1] - (dir * err * 0.8f);
+					rope.segmentPositions[i] = rope.segmentPositions[i] + (dir * err);
+				}
+			}
+		}
+
+		if (_entityManager.getTag(entity) == "UFO") 
+		{
+			float a = 0;
+		}
+
+		if (rope.direction != nullptr)
+		{
+			*rope.direction = rope.segmentPositions[rope.ropeLength - 2] - rope.segmentPositions[rope.ropeLength - 1];
+			float angle = rope.positionOffset.angle(*rope.direction);
+			Vec2 newOffset(rope.positionOffset.x * cos(angle) - rope.positionOffset.y * sin(angle), rope.positionOffset.x * sin(angle) + rope.positionOffset.y * cos(angle));
+			*rope.position = rope.segmentPositions[rope.ropeLength - 1] - newOffset;
+		}
+		else
+		{
+			*rope.position = rope.segmentPositions[rope.ropeLength - 1] + rope.positionOffset;
+		}
+	}
+}
 
 void Scene_Play::onKeyAction(std::string actionName, KeyAction action)
 {
@@ -1029,7 +1038,8 @@ void Scene_Play::spawnUFO()
 	ani->init(entity, _entityManager);
 	_entityManager.addComponent<Component::CAnimation>(entity, ani);
 
-	std::shared_ptr<AIUFO> ai = std::make_shared<AIUFO>(&transform.position, &earthTransform.position, &_entityManager);
+	size_t timeToShoot = 3 * 60 + (rand() % (3 * 60));
+	std::shared_ptr<AIUFO> ai = std::make_shared<AIUFO>(&transform.position, &earthTransform.position, &_entityManager, timeToShoot);
 	_entityManager.addComponent<Component::CAI>(entity, ai);
 
 	size_t ropeSegs = 20;
@@ -1040,6 +1050,39 @@ void Scene_Play::spawnUFO()
 	orbitTarget.y = orbitTarget.y - _engine->getWindow().getSize().y;
 	auto& orbit = _entityManager.addComponent<Component::Orbit>(entity, &earthTransform.position, dist, 0.01f, (bool)(rand() % 2), angle, false, false);
 	orbit.moving = true;
+}
+
+void Scene_Play::spawnUFO2()
+{
+	auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+
+	Vec2 pos(0, 0);
+	pos.x = rand() % 2 == 0 ? -500 : _engine->getWindowSize().x + 500;
+	pos.y = rand() % 2 == 0 ? 100 : _engine->getWindowSize().y - 100;
+
+	Vec2 vel((earthTransform.position.x > pos.x ? 8 : -8), 0);
+
+	auto entity = _entityManager.createEntity("UFO");
+	auto& transform = _entityManager.addComponent<Component::Transform>(entity, Vec2(pos.x + 20, pos.y - 300), vel, Vec2(1, 1), true);
+	_entityManager.addComponent<Component::Health>(entity, 1);
+	auto& mat = _entityManager.addComponent<Component::Material>(entity, _engine->getAssets().getSprite("UFO"), true);
+	_entityManager.addComponent<Component::BoundingBox>(entity, (mat.sprite.getSize() * 0.6f));
+	_entityManager.addComponent<Component::Lifespan>(entity, 8 * 60);
+
+	std::shared_ptr<Cooldown> ani = std::make_shared<Cooldown>(_engine, 120);
+	ani->init(entity, _entityManager);
+	_entityManager.addComponent<Component::CAnimation>(entity, ani);
+
+	size_t timeToShoot = 0.5 * 60 + (rand() % (1 * 60));
+	std::shared_ptr<AIUFO> ai = std::make_shared<AIUFO>(&transform.position, &earthTransform.position, &_entityManager, timeToShoot);
+	_entityManager.addComponent<Component::CAI>(entity, ai);
+
+	size_t ropeSegs = 20;
+	float segDist = (_engine->getWindow().getSize().y) / ropeSegs;
+	_entityManager.addComponent<Component::Rope>(entity, ropeSegs, segDist, Vec2(pos.x, pos.y - segDist * ropeSegs), &transform.position, &transform.direction, Vec2(0, 28), true);
+
+	handleRope(entity);
+	handleRope(entity);
 }
 
 void Scene_Play::spawnBoss() 
