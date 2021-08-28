@@ -135,6 +135,26 @@ void Scene_Play::tick()
 
 	handleCollisions();
 
+	//Handle parent
+	for (Entity entity : _entityManager.getEntities())
+	{
+		if (_entityManager.hasComponent<Component::Parent>(entity)) 
+		{
+			auto& parent = _entityManager.getComponent<Component::Parent>(entity);
+			auto& transform = _entityManager.getComponent<Component::Transform>(entity);
+			if (_entityManager.isAlive(parent.parent)) 
+			{
+				transform.position = *parent.position;
+				//transform.direction = *parent.directon;
+				transform.direction = *parent.velocity / parent.velocity->mag();
+			}
+			else 
+			{
+				_entityManager.destroyEntity(entity);
+			}
+		}
+	}
+
 
 	if (satelliteCooldown > 0) 
 	{
@@ -736,6 +756,29 @@ void Scene_Play::handleAnimations(Entity entity)
 			_entityManager.removeComponent<Component::CAnimation>(entity);
 		}
 	}
+
+	if (_entityManager.getTag(entity) == "AsteroidFlame") 
+	{
+		Entity asteroid = _entityManager.getComponent<Component::Parent>(entity).parent;
+		auto& asteroidTransform = _entityManager.getComponent<Component::Transform>(asteroid);
+		auto& earthTransform = _entityManager.getComponent<Component::Transform>(earth);
+
+		//If asteroid destroyed remove effect
+		if (!_entityManager.hasComponent<Component::BoundingBox>(asteroid)) 
+		{
+			_entityManager.destroyEntity(entity);
+		}
+
+		if ((earthTransform.position - asteroidTransform.position).mag() < 250 && !_entityManager.hasComponent<Component::CAnimation>(asteroid)) 
+		{
+			auto& mat = _entityManager.getComponent<Component::Material>(entity);
+			if (mat.opacity < 255) 
+			{
+				mat.opacity += 1;
+				if (mat.opacity > 255) { mat.opacity = 255; }
+			}
+		}
+	}
 }
 
 void Scene_Play::handleRope(Entity entity)
@@ -1015,6 +1058,11 @@ void Scene_Play::spawnAsteroid()
 	float segDist = (pos.y + _engine->getWindow().getSize().y / 2.0f) / ropeSegs;
 	_entityManager.addComponent<Component::Rope>(entity, ropeSegs, segDist,  Vec2(pos.x, -(float)_engine->getWindow().getSize().y/2.0f), &transform.position, &transform.direction, Vec2(0,32), true);
 
+	//Add Flame Effect
+	auto flame = _entityManager.createEntity("AsteroidFlame");
+	_entityManager.addComponent<Component::Transform>(flame, transform.position, Vec2(0, 0), Vec2(3, 1.8), true);
+	_entityManager.addComponent<Component::Material>(flame, _engine->getAssets().getSprite("Fireball"), true).opacity = 0;
+	_entityManager.addComponent<Component::Parent>(flame, entity, &transform.position, &transform.direction, &transform.velocity);
 }
 
 void Scene_Play::spawnGammaWarning()

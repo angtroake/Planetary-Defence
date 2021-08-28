@@ -43,6 +43,7 @@ namespace Component {
 		bool repeat;
 		sf::IntRect crop;
 		std::shared_ptr<sf::Shader> fragShader = nullptr;
+		int opacity = 255;
 	};
 
 	class Health : public Component
@@ -188,6 +189,18 @@ namespace Component {
 		Invincibility(size_t frames): frames(frames) {}
 
 		size_t frames;
+	};
+
+	class Parent : public Component 
+	{
+	public:
+		Parent() {}
+		Parent(Entity entity, Vec2* position, Vec2* directon, Vec2* velocity):parent(entity), position(position), directon(directon), velocity(velocity) {}
+
+		Entity parent;
+		Vec2* position;
+		Vec2* directon;
+		Vec2* velocity;
 	};
 }
 

@@ -25,7 +25,8 @@ typedef std::tuple <
 	Component::Lifespan[MAX_ENTITIES],
 	Component::PopsicleStick[MAX_ENTITIES],
 	Component::CAI[MAX_ENTITIES],
-	Component::Invincibility[MAX_ENTITIES]
+	Component::Invincibility[MAX_ENTITIES],
+	Component::Parent[MAX_ENTITIES]
 > ComponentArrays;
 
 

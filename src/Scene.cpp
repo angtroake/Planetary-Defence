@@ -55,7 +55,7 @@ void Scene::renderEntity(const int & entity, bool debug, std::string renderOnly)
 		}
 		else if(!_entityManager.hasComponent<Component::CAnimation>(entity))
 		{
-			mat.sprite.get().setColor(sf::Color(255, 255, 255, 255));
+			mat.sprite.get().setColor(sf::Color(255, 255, 255, mat.opacity));
 		}
 
 		if (transfrom.rotates) 

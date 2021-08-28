@@ -22,6 +22,8 @@ void AssetManager::init()
 	createSprite("Asteroid1", getTexture("Asteroid1"), 16, 16, 250, 1);
 	addTexture("Asteroid2", "assets/img/asteroid2.png");
 	createSprite("Asteroid2", getTexture("Asteroid2"), 16, 16, 250, 1);
+	addTexture("Fireball", "assets/img/fire_ball.png");
+	createSprite("Fireball", getTexture("Fireball"), 1, 5, 5, 3);
 
 	//Gamma Stuff
 	addTexture("GammaWarning", "assets/img/gamma_warning.png");
