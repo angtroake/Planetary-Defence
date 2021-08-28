@@ -34,6 +34,7 @@ protected:
 	bool renderDebug = false;
 	bool alive = true;
 
+	bool gameover = false;
 	
 	bool isBoss = false;
 	bool isBossWarning = false;

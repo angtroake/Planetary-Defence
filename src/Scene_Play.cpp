@@ -243,9 +243,27 @@ void Scene_Play::tick()
 	timeAlive++;
 
 
-	if (_entityManager.getComponent<Component::Health>(earth).health <= 0)
+	if (_entityManager.getComponent<Component::Health>(earth).health <= 0 && alive)
 	{
 		alive = false;
+		//_engine->changeScene(std::make_shared<Scene_Gameover>(_engine), "GAME_OVER", true);
+		_entityManager.removeComponent<Component::Material>(earth);
+		_entityManager.removeComponent<Component::BoundingBox>(earth);
+		_entityManager.destroyEntity(earthDamage);
+		_entityManager.destroyEntity(shield);
+		_entityManager.destroyEntity(satellite);
+		_entityManager.addComponent<Component::Lifespan>(earth, 1.5 * 60);
+
+		auto& t = _entityManager.getComponent<Component::Transform>(earth);
+		auto p = _entityManager.createEntity("Particle");
+		_entityManager.addComponent<Component::Transform>(p, t.position, Vec2(0, 0), Vec2(5, 5), false);
+		_entityManager.addComponent<Component::Material>(p, _engine->getAssets().getSprite("Explosion"), false);
+		size_t soundIndex = rand() % 6;
+		_engine->getAssets().getSound("Explode" + std::to_string(soundIndex)).play();
+	}
+
+	if (gameover) 
+	{
 		_engine->changeScene(std::make_shared<Scene_Gameover>(_engine), "GAME_OVER", true);
 	}
 
@@ -726,6 +744,10 @@ void Scene_Play::handleLifespan(Entity entity)
 			else if (_entityManager.getTag(entity) == "BossWarning") 
 			{
 				spawnBoss();
+			}
+			else if (entity == earth) 
+			{
+				gameover = true;
 			}
 
 			_entityManager.destroyEntity(entity);
